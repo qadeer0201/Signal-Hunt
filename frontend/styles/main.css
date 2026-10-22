@@ -1,0 +1,172 @@
+/* =============================================================
+   Signal Hunt — Main Design System
+   Theme: campus mystery / detective dossier
+   ============================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #0a0b09;
+  --bg-alt: #10120e;
+  --bg-surface: #151812;
+  --bg-surface-raised: #1b1f16;
+  --panel: #f3e8c9;
+  --panel-light: #fbf2d8;
+  --panel-deep: #e8d9b3;
+  --text-on-light: #191a13;
+  --text-dim-light: #55503e;
+  --text-on-dark: #f3e8c9;
+  --text-dim-dark: #c0b99e;
+  --text-faint: #918b74;
+  --lime: #d8ff36;
+  --lime-dim: #bde52b;
+  --lime-soft: rgba(216, 255, 54, .12);
+  --lime-line: rgba(216, 255, 54, .36);
+  --red: #d94141;
+  --red-soft: rgba(217, 65, 65, .12);
+  --border-dark: #34382a;
+  --border-light: #d0c19b;
+  --font-display: 'Barlow Condensed', Impact, 'Arial Narrow', sans-serif;
+  --font-body: 'DM Sans', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', Consolas, monospace;
+  --radius-xs: 5px;
+  --radius-sm: 8px;
+  --radius-md: 13px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --shadow-card: 0 12px 28px rgba(0, 0, 0, .23);
+  --shadow-float: 0 18px 55px rgba(0, 0, 0, .45);
+  --transition: 180ms ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { min-height: 100%; font-size: 16px; scroll-behavior: smooth; }
+body {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  color: var(--text-on-dark);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 50% -20%, rgba(78, 96, 39, .22), transparent 58%),
+    repeating-linear-gradient(135deg, rgba(216,255,54,.018) 0, rgba(216,255,54,.018) 1px, transparent 1px, transparent 22px);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button, input, select, textarea { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible, a:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+}
+button:disabled { cursor: not-allowed; opacity: .55; }
+img, svg { max-width: 100%; }
+
+::selection { color: var(--bg); background: var(--lime); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #424735; border: 2px solid var(--bg); border-radius: 99px; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.05;
+  font-weight: 700;
+  text-wrap: balance;
+}
+h1 { letter-spacing: .035em; }
+h2 { letter-spacing: .045em; }
+h3 { letter-spacing: .035em; }
+p { line-height: 1.65; }
+code, .mono { font-family: var(--font-mono); }
+
+.hidden { display: none !important; }
+.section { display: none; animation: sectionIn .24s ease both; }
+.section--active { display: block; }
+@keyframes sectionIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes softPulse {
+  0%, 100% { opacity: .78; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.035); }
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: .3; }
+  50% { opacity: 1; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+.shake { animation: shake .38s ease; }
+
+/* Gentle terminal texture. Purely decorative and never blocks interaction. */
+#scanline {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  opacity: .24;
+  background: repeating-linear-gradient(0deg, transparent 0, transparent 4px, rgba(0,0,0,.08) 4px, rgba(0,0,0,.08) 5px);
+}
+
+.parchment {
+  background: var(--panel);
+  color: var(--text-on-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.parchment-warm { background: var(--panel-deep); }
+.dark-panel {
+  color: var(--text-on-dark);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-lg);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .42rem .7rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .055em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.status-wait {
+  color: var(--lime);
+  background: rgba(216,255,54,.075);
+  border: 1px solid var(--lime-line);
+}
+.status-live {
+  color: #ff9292;
+  background: var(--red-soft);
+  border: 1px solid rgba(217,65,65,.46);
+}
+
+.label-micro {
+  color: var(--text-faint);
+  font: 500 .64rem/1.4 var(--font-mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.label-micro-light { color: var(--text-dim-light); }
+.divider { height: 1px; margin: 1rem 0; background: linear-gradient(90deg, var(--border-light), transparent); }
+.divider-dark { background: linear-gradient(90deg, var(--border-dark), transparent); }
+.container { width: 100%; max-width: 1120px; margin-inline: auto; padding-inline: 1rem; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-sm { gap: .5rem; }
+.gap-md { gap: 1rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

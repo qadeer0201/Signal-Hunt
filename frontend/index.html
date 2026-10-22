@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO -->
+  <title>Signal Hunt — Nexus Vyoma 2026</title>
+  <meta name="description"
+        content="Signal Hunt is the campus puzzle challenge for Nexus Vyoma 2026. Find the signals. Solve the mystery. Unlock the truth." />
+  <meta name="theme-color" content="#111210" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+</head>
+<body>
+
+  <!-- CRT scanline overlay (cosmetic only) -->
+  <div id="scanline" aria-hidden="true"></div>
+
+
+  <!-- ================================================================
+       LOGIN SCREEN
+       ================================================================ -->
+  <div id="login-screen">
+
+    <!-- Hero branding -->
+    <div class="login-hero">
+      <!-- SVG antenna tower icon -->
+      <svg class="login-logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Tower legs -->
+        <line x1="32" y1="10" x2="14" y2="54" stroke="#c8f135" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="32" y1="10" x2="50" y2="54" stroke="#c8f135" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Cross braces -->
+        <line x1="20" y1="34" x2="44" y2="34" stroke="#c8f135" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="17" y1="46" x2="47" y2="46" stroke="#c8f135" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="22" y1="34" x2="16" y2="46" stroke="#c8f135" stroke-width="1.2" opacity="0.5"/>
+        <line x1="42" y1="34" x2="48" y2="46" stroke="#c8f135" stroke-width="1.2" opacity="0.5"/>
+        <!-- Tip glow circle -->
+        <circle cx="32" cy="9" r="3.5" fill="#c8f135"/>
+        <!-- Signal arcs -->
+        <path d="M22 16 Q32 8 42 16" stroke="#c8f135" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+        <path d="M16 11 Q32 1  48 11" stroke="#c8f135" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.35"/>
+      </svg>
+
+      <h1>SIGNAL HUNT</h1>
+      <p class="event-sub">Nexus Vyoma 2026 · Campus Puzzle Challenge</p>
+      <p class="tagline">Find the signals. Solve the mystery. Unlock the truth.</p>
+    </div><!-- /.login-hero -->
+
+
+    <!-- Login card -->
+    <div class="login-card" role="main">
+      <p class="login-card-title">Access Your Team</p>
+
+      <form id="login-form" novalidate autocomplete="off">
+
+        <!-- Step 1: colour selection -->
+        <div class="colour-select-wrap">
+          <label class="colour-select-label">Select your team colour</label>
+          <div
+            id="colour-grid"
+            class="colour-grid"
+            role="radiogroup"
+            aria-label="Team colour selection"
+          >
+            <!-- Chips injected by app.js -->
+          </div>
+        </div>
+
+        <!-- Step 2: team code -->
+        <div class="field-group">
+          <label class="field-label" for="team-code-input">Enter team code</label>
+          <input
+            id="team-code-input"
+            class="field-input"
+            type="text"
+            placeholder="e.g. R7X2"
+            maxlength="24"
+            spellcheck="false"
+            autocorrect="off"
+            autocapitalize="characters"
+          />
+        </div>
+
+        <!-- Error message -->
+        <p id="login-error" role="alert" aria-live="polite"></p>
+
+        <!-- Submit -->
+        <button id="login-submit" type="submit" class="btn-cta">
+          <span>Enter the Hunt</span>
+          <span class="arrow">→</span>
+        </button>
+
+        <!-- Prototype data notice -->
+        <div class="mock-notice" role="note">
+          <strong>⚠ PROTOTYPE DATA</strong><br />
+          Pick a colour, then type its code. Examples:<br />
+          Red → <strong>RED-ALPHA</strong> · Blue → <strong>BLUE-NOVA</strong> · Gold → <strong>GLD-CROWN</strong>
+        </div>
+
+      </form>
+    </div><!-- /.login-card -->
+
+    <p class="entry-note">Team entry only · Each team has a unique code</p>
+
+  </div><!-- /#login-screen -->
+
+
+  <!-- ================================================================
+       APP SHELL (shown after login)
+       ================================================================ -->
+  <div id="app-shell" class="hidden">
+
+    <!-- ── Top Bar ── -->
+    <header class="topbar" role="banner">
+
+      <!-- Brand -->
+      <div class="topbar-brand">
+        <!-- Antenna icon (small) -->
+        <svg class="topbar-antenna" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <line x1="32" y1="10" x2="14" y2="54" stroke="#c8f135" stroke-width="3" stroke-linecap="round"/>
+          <line x1="32" y1="10" x2="50" y2="54" stroke="#c8f135" stroke-width="3" stroke-linecap="round"/>
+          <line x1="20" y1="34" x2="44" y2="34" stroke="#c8f135" stroke-width="2" stroke-linecap="round"/>
+          <line x1="17" y1="46" x2="47" y2="46" stroke="#c8f135" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="32" cy="9" r="4" fill="#c8f135"/>
+          <path d="M22 16 Q32 8 42 16" stroke="#c8f135" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+        <div class="topbar-logo-text">
+          <span class="logo-main">SIGNAL HUNT</span>
+          <span class="logo-sub">Nexus Vyoma 2026</span>
+        </div>
+      </div>
+
+      <!-- Desktop navigation — populated by nav.js -->
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <ul id="nav-links">
+          <!-- Injected by nav.js -->
+        </ul>
+      </nav>
+
+      <div class="topbar-spacer"></div>
+
+      <!-- Right cluster -->
+      <div class="topbar-right">
+        <!-- Team colour dot -->
+        <div id="topbar-team-colour" aria-hidden="true"></div>
+        <!-- Profile modal trigger -->
+        <button id="profile-btn" class="btn-profile" aria-label="View team profile">👤</button>
+        <!-- Logout -->
+        <button id="logout-btn" class="btn-logout" aria-label="Log out">Logout</button>
+      </div>
+
+    </header><!-- /.topbar -->
+
+
+    <!-- ── Main content ── -->
+    <main class="page-content" id="main-content" role="main">
+
+
+      <!-- ═══════════════════════════════════════════════════
+           HOME / WAITING ROOM
+           ═══════════════════════════════════════════════════ -->
+      <section
+        id="section-home"
+        class="section"
+        aria-label="Home — Waiting Room"
+        aria-hidden="true"
+      >
+        <div class="waiting-room">
+
+          <!-- Welcome banner (parchment) -->
+          <div class="welcome-banner">
+            <!-- Greeting populated by app.js -->
+            <div
+              class="team-greeting"
+              id="welcome-greeting"
+              data-profile="welcome-greeting"
+            >Welcome, Team.</div>
+            <div class="team-code-line">
+              <!-- Team colour dot -->
+              <span
+                class="team-colour-dot"
+                id="welcome-colour-dot"
+                data-profile="colour-dot"
+                aria-hidden="true"
+              ></span>
+              <!-- Team code -->
+              <span
+                id="welcome-team-code"
+                data-profile="team-code"
+                style="font-family:var(--font-mono); font-size:0.8rem;"
+              >Team Code: —</span>
+            </div>
+          </div>
+
+          <!-- Game status card -->
+          <div class="game-status-card" aria-live="polite">
+            <div class="gs-label">Game Status</div>
+
+            <!-- Standby pill -->
+            <div class="standby-pill">
+              <div class="standby-pill-icon" aria-hidden="true">📡</div>
+              <div class="standby-pill-text">
+                <div class="pill-title">
+                  <span
+                    id="game-status-badge"
+                    data-profile="game-status"
+                    class="status-badge status-wait"
+                  >Standby · Awaiting Host</span>
+                </div>
+                <div class="pill-sub">
+                  The host has not started the game yet.<br />
+                  Read the mission, knowledge, and rules to prepare.
+                </div>
+              </div>
+            </div>
+
+            <div class="terminal-dots" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <!-- Quick-nav tiles -->
+          <div class="home-quick-nav">
+            <button class="quick-tile" onclick="Nav.switchTo('mission')" type="button">
+              <div class="quick-tile-icon" aria-hidden="true">📋</div>
+              <div class="quick-tile-text">
+                <span class="tile-label">Mission</span>
+                <span class="tile-sub">Event story &amp; flow</span>
+              </div>
+            </button>
+            <button class="quick-tile" onclick="Nav.switchTo('knowledge')" type="button">
+              <div class="quick-tile-icon" aria-hidden="true">📖</div>
+              <div class="quick-tile-text">
+                <span class="tile-label">Knowledge</span>
+                <span class="tile-sub">Reference sheets</span>
+              </div>
+            </button>
+            <button class="quick-tile" onclick="Nav.switchTo('rules')" type="button">
+              <div class="quick-tile-icon" aria-hidden="true">✅</div>
+              <div class="quick-tile-text">
+                <span class="tile-label">Rules</span>
+                <span class="tile-sub">Important guidelines</span>
+              </div>
+            </button>
+            <button class="quick-tile" onclick="Nav.switchTo('mission')" type="button">
+              <div class="quick-tile-icon" aria-hidden="true">🗺</div>
+              <div class="quick-tile-text">
+                <span class="tile-label">Campus Map</span>
+                <span class="tile-sub">View campus map</span>
+              </div>
+            </button>
+          </div>
+
+        </div><!-- /.waiting-room -->
+      </section><!-- /#section-home -->
+
+
+      <!-- ═══════════════════════════════════════════════════
+           MISSION SECTION
+           ═══════════════════════════════════════════════════ -->
+      <section
+        id="section-mission"
+        class="section"
+        aria-label="Mission"
+        aria-hidden="true"
+      >
+        <div class="section-header">
+          <h2>Mission</h2>
+          <span class="section-id">SH-02</span>
+        </div>
+
+        <div class="mission-layout">
+          <!-- Left column -->
+          <div class="mission-left">
+
+            <!-- Story panel -->
+            <div class="mission-story">
+              <p class="story-eyebrow">Briefing</p>
+              <h2>The Mission</h2>
+              <p>
+                Decode the signals, follow the clues, reach the checkpoints and complete all
+                four challenges. Use your knowledge, teamwork, and observation to reach the
+                final destination.
+              </p>
+            </div>
+
+            <!-- Campus map placeholder -->
+            <div
+              class="map-placeholder"
+              role="img"
+              aria-label="Campus map — placeholder. Real layout will be added later."
+            >
+              <div class="map-icon" aria-hidden="true">🗺</div>
+              <div class="map-title">2D Campus Map</div>
+              <p class="map-sub">
+                ⚠ Placeholder — real campus layout not yet digitised.<br />
+                An accurate map will be added in a future update.
+              </p>
+              <div class="map-corner-tag">MAP v0.0 · NOT TO SCALE</div>
+            </div>
+
+          </div><!-- /.mission-left -->
+
+          <!-- Right column -->
+          <div class="mission-right">
+
+            <!-- Station list -->
+            <div class="stations-panel">
+              <div class="stations-panel-header">The Four Stations</div>
+              <div class="station-item">
+                <div class="station-num">01</div>
+                <div class="station-name">Station 1</div>
+                <div class="station-arrow" aria-hidden="true">›</div>
+              </div>
+              <div class="station-item">
+                <div class="station-num">02</div>
+                <div class="station-name">Station 2</div>
+                <div class="station-arrow" aria-hidden="true">›</div>
+              </div>
+              <div class="station-item">
+                <div class="station-num">03</div>
+                <div class="station-name">Station 3</div>
+                <div class="station-arrow" aria-hidden="true">›</div>
+              </div>
+              <div class="station-item">
+                <div class="station-num">04</div>
+                <div class="station-name">Final Challenge</div>
+                <div class="station-arrow" aria-hidden="true">›</div>
+              </div>
+            </div>
+
+          </div><!-- /.mission-right -->
+        </div><!-- /.mission-layout -->
+      </section><!-- /#section-mission -->
+
+
+      <!-- ═══════════════════════════════════════════════════
+           KNOWLEDGE SECTION
+           ═══════════════════════════════════════════════════ -->
+      <section
+        id="section-knowledge"
+        class="section"
+        aria-label="Knowledge Base"
+        aria-hidden="true"
+      >
+        <div class="section-header">
+          <h2>Knowledge</h2>
+          <span class="section-id">SH-03</span>
+        </div>
+
+        <div class="knowledge-layout">
+
+          <!-- Sidebar (desktop only — hidden on mobile via CSS) -->
+          <nav class="knowledge-sidebar" aria-label="Knowledge topics">
+            <button class="knowledge-nav-item active" data-pane="morse"     type="button">
+              <div class="kn-icon" aria-hidden="true">∿∿</div>
+              Morse Code
+            </button>
+            <button class="knowledge-nav-item" data-pane="binary"    type="button">
+              <div class="kn-icon" aria-hidden="true">01</div>
+              Binary ASCII
+            </button>
+            <button class="knowledge-nav-item" data-pane="fsk"       type="button">
+              <div class="kn-icon" aria-hidden="true">∿▲</div>
+              FSK Signals
+            </button>
+            <button class="knowledge-nav-item" data-pane="tips"      type="button">
+              <div class="kn-icon" aria-hidden="true">💡</div>
+              Extra Tips
+            </button>
+          </nav>
+
+          <!-- Content panes -->
+          <div class="knowledge-content">
+
+            <!-- Morse Code -->
+            <div class="knowledge-pane active" id="pane-morse">
+              <div class="pane-title">Morse Code</div>
+              <div class="pane-sub">Dots, dashes and letter decoding</div>
+              <div class="pane-body">
+                <p>
+                  Morse code represents letters and numbers using short signals (dots <strong>·</strong>)
+                  and long signals (dashes <strong>—</strong>).
+                  Each letter is separated by a small gap; words by a larger gap.
+                </p>
+                <br />
+                <p><strong>Key letters:</strong></p>
+                <p style="font-family:var(--font-mono); font-size:0.8rem; line-height:2; color:var(--text-on-dark);">
+                  A · —&nbsp;&nbsp; B — · · ·&nbsp;&nbsp; C — · — ·&nbsp;&nbsp; D — · ·<br />
+                  E ·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; F · · — ·&nbsp;&nbsp; G — — ·&nbsp;&nbsp;&nbsp; H · · · ·<br />
+                  I · ·&nbsp;&nbsp;&nbsp;&nbsp; J · — — —&nbsp; K — · —&nbsp;&nbsp;&nbsp; L · — · ·<br />
+                  M — —&nbsp;&nbsp;&nbsp; N — ·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O — — —&nbsp;&nbsp; P · — — ·<br />
+                  S · · ·&nbsp;&nbsp; T —&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; U · · —&nbsp;&nbsp;&nbsp; V · · · —
+                </p>
+              </div>
+            </div>
+
+            <!-- Binary ASCII -->
+            <div class="knowledge-pane" id="pane-binary">
+              <div class="pane-title">Binary ASCII</div>
+              <div class="pane-sub">8-bit sequences and text conversion</div>
+              <div class="pane-body">
+                <p>
+                  ASCII maps characters to numbers. Binary represents those numbers in base-2.
+                  Each character = 8 bits (one byte).
+                </p>
+                <br />
+                <p><strong>Examples:</strong></p>
+                <p style="font-family:var(--font-mono); font-size:0.8rem; line-height:2; color:var(--text-on-dark);">
+                  A = 65 = 01000001<br />
+                  B = 66 = 01000010<br />
+                  Z = 90 = 01011010<br />
+                  0 = 48 = 00110000<br />
+                  Space = 32 = 00100000
+                </p>
+                <br />
+                <p>To decode: convert each 8-bit group to decimal, then look up the ASCII table.</p>
+              </div>
+            </div>
+
+            <!-- FSK Signals -->
+            <div class="knowledge-pane" id="pane-fsk">
+              <div class="pane-title">FSK Signals</div>
+              <div class="pane-sub">Frequency changes and waveform reference</div>
+              <div class="pane-body">
+                <p>
+                  FSK (Frequency-Shift Keying) encodes data by switching between two frequencies.
+                  A higher frequency represents a 1 (mark) and a lower frequency represents a 0 (space).
+                </p>
+                <br />
+                <p><strong>Remember:</strong></p>
+                <p style="font-family:var(--font-mono); font-size:0.82rem; line-height:2; color:var(--text-on-dark);">
+                  High tone → 1 (mark)<br />
+                  Low tone  → 0 (space)<br />
+                  Decode the sequence → convert binary → ASCII
+                </p>
+                <br />
+                <p>Listen carefully to the frequency shifts at each station.</p>
+              </div>
+            </div>
+
+            <!-- Extra Tips -->
+            <div class="knowledge-pane" id="pane-tips">
+              <div class="pane-title">Extra Tips</div>
+              <div class="pane-sub">Useful information and examples</div>
+              <div class="pane-body">
+                <p><strong>General advice for the hunt:</strong></p>
+                <br />
+                <p>• Split roles in your team: one person records, one decodes, one navigates.</p>
+                <br />
+                <p>• Always double-check your decoded answer before submitting — mistakes cost time.</p>
+                <br />
+                <p>• If you are stuck at a station, move on and return later.</p>
+                <br />
+                <p>• Stay calm. Speed matters, but accuracy matters more.</p>
+                <br />
+                <p>• Keep this Knowledge section open on one device throughout the game.</p>
+              </div>
+            </div>
+
+          </div><!-- /.knowledge-content -->
+        </div><!-- /.knowledge-layout -->
+      </section><!-- /#section-knowledge -->
+
+
+      <!-- ═══════════════════════════════════════════════════
+           RULES SECTION
+           ═══════════════════════════════════════════════════ -->
+      <section
+        id="section-rules"
+        class="section"
+        aria-label="Rules"
+        aria-hidden="true"
+      >
+        <div class="section-header">
+          <h2>Rules &amp; Guidelines</h2>
+          <span class="section-id">SH-04</span>
+        </div>
+
+        <ol class="rules-list" aria-label="Game rules">
+
+          <li>
+            <div class="rule-icon" aria-hidden="true">📋</div>
+            <div class="rule-content">
+              <strong>Game Rules</strong>
+              <p>Follow the event instructions at all times. All signal stations are within the campus boundary. Teams must not leave the campus during the game.</p>
+            </div>
+          </li>
+
+          <li>
+            <div class="rule-icon" aria-hidden="true">⚠️</div>
+            <div class="rule-content">
+              <strong>Zero-Warning Policy</strong>
+              <p>Violations of the rules may result in direct elimination without a prior warning. Decisions by organisers are final and binding.</p>
+            </div>
+          </li>
+
+          <li>
+            <div class="rule-icon" aria-hidden="true">🏫</div>
+            <div class="rule-content">
+              <strong>Safety Guidelines</strong>
+              <p>Stay within designated campus zones. Do not tamper with, remove, or damage any station markers or equipment. Replacements will not be provided mid-game.</p>
+            </div>
+          </li>
+
+          <li>
+            <div class="rule-icon" aria-hidden="true">🤝</div>
+            <div class="rule-content">
+              <strong>Fair Play</strong>
+              <p>Do not share codes with other teams. Using another team's code is cheating and leads to disqualification. All teams start simultaneously — no head-starts.</p>
+            </div>
+          </li>
+
+          <li>
+            <div class="rule-icon" aria-hidden="true">📝</div>
+            <div class="rule-content">
+              <strong>General Instructions</strong>
+              <p>One device per team for this platform. Personal phones are permitted for navigation only. If an organiser signals a pause, all teams must halt immediately.</p>
+            </div>
+          </li>
+
+        </ol>
+
+        <div class="rules-footer">
+          <strong>NOTE:</strong> These rules are a draft for prototype review.
+          Final rules will be confirmed by the Nexus Vyoma 2026 organising committee.
+        </div>
+
+      </section><!-- /#section-rules -->
+
+    </main><!-- /#main-content -->
+
+
+    <!-- ── Mobile bottom navigation — built by nav.js ── -->
+    <nav class="bottom-nav" aria-label="Mobile navigation">
+      <ul id="nav-links-mobile">
+        <!-- Populated by nav.js -->
+      </ul>
+    </nav>
+
+  </div><!-- /#app-shell -->
+
+
+  <!-- ================================================================
+       TEAM PROFILE MODAL
+       Shown when the profile icon is clicked.
+       app.js wires the open/close buttons.
+       ================================================================ -->
+  <div id="profile-modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Team profile">
+    <div class="profile-modal">
+
+      <div class="profile-modal-header">
+        <h3>Team Profile</h3>
+        <button id="profile-modal-close" class="btn-modal-close" aria-label="Close profile">✕</button>
+      </div>
+
+      <div class="profile-modal-body">
+
+        <!-- Colour swatch row -->
+        <div class="profile-colour-row">
+          <!-- Swatch square -->
+          <div
+            id="profile-colour-swatch"
+            class="profile-colour-swatch"
+            data-profile="colour-dot"
+            role="img"
+            aria-label="Team colour"
+          ></div>
+          <div class="profile-colour-info">
+            <div
+              class="colour-name"
+              id="profile-colour-label"
+              data-profile="colour-label"
+            >—</div>
+            <div class="colour-sub">Team Colour</div>
+          </div>
+        </div>
+
+        <!-- Info list -->
+        <div class="profile-info-list">
+
+          <div class="profile-info-row">
+            <span class="pi-label">Team Colour</span>
+            <span
+              class="pi-value"
+              id="profile-colour-label-2"
+              data-profile="colour-label"
+            >—</span>
+          </div>
+
+          <div class="profile-info-row">
+            <span class="pi-label">Team Code</span>
+            <span
+              class="pi-value"
+              id="profile-team-code"
+              data-profile="team-code"
+            >—</span>
+          </div>
+
+          <div class="profile-info-row">
+            <span class="pi-label">Current Status</span>
+            <span
+              id="profile-status"
+              data-profile="game-status"
+              class="status-badge status-wait"
+            >Standby · Awaiting Host</span>
+          </div>
+
+        </div>
+      </div><!-- /.profile-modal-body -->
+
+      <div class="profile-modal-footer">
+        <button id="profile-modal-cta" class="btn-modal-cta" type="button">Close</button>
+      </div>
+
+    </div><!-- /.profile-modal -->
+  </div><!-- /#profile-modal-overlay -->
+
+
+  <!-- Scripts: data → auth → nav → app (order matters) -->
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
