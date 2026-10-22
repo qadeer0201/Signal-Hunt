@@ -46,6 +46,12 @@ const Nav = (() => {
   // Public: Switch the visible section and sync ALL nav buttons
   // -------------------------------------------------------------------------
   function switchTo(sectionId) {
+    // Close the mobile knowledge-reference detail when leaving Knowledge.
+    const knowledgeSection = document.getElementById("section-knowledge");
+    if (knowledgeSection && sectionId !== "knowledge") {
+      knowledgeSection.classList.remove("knowledge-reference-open");
+    }
+
     // Hide all sections
     document.querySelectorAll(".section").forEach((el) => {
       el.classList.remove("section--active");
@@ -59,9 +65,12 @@ const Nav = (() => {
       target.setAttribute("aria-hidden", "false");
     }
 
+    // Campus Map is a Home sub-page, so keep Home highlighted in the nav.
+    const navSection = sectionId === "campus-map" ? "home" : sectionId;
+
     // Sync active state across ALL nav buttons (desktop + mobile)
     document.querySelectorAll(".nav-btn").forEach((btn) => {
-      btn.classList.toggle("nav-btn--active", btn.dataset.section === sectionId);
+      btn.classList.toggle("nav-btn--active", btn.dataset.section === navSection);
     });
 
     currentSection = sectionId;

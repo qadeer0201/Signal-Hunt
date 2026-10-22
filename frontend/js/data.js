@@ -46,7 +46,8 @@ const TEAM_COLOURS = [
 // In production this would be a live WebSocket or polling value.
 // ---------------------------------------------------------------------------
 const GAME_STATE = {
-  started: false,      // false = waiting room, true = game is live
+  started: false,      // real game status is not connected; preview button simulates this locally
+  previewOnly: true,
   eventName: "Nexus Vyoma 2026",
   eventSubtitle: "Signal Hunt — Campus Puzzle Challenge",
 };

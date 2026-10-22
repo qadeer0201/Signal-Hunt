@@ -196,7 +196,7 @@
           </div>
 
           <!-- Game status card -->
-          <div class="game-status-card" aria-live="polite">
+          <div id="game-status-card" class="game-status-card" aria-live="polite">
             <div class="gs-label">Game Status</div>
 
             <!-- Standby pill -->
@@ -220,40 +220,103 @@
             <div class="terminal-dots" aria-hidden="true">
               <span></span><span></span><span></span>
             </div>
+            <div class="prototype-start-wrap">
+              <span class="prototype-control-label">Local UI preview only</span>
+              <button id="preview-host-start" class="preview-start-btn" type="button">Preview when host starts →</button>
+            </div>
           </div>
 
-          <!-- Quick-nav tiles -->
-          <div class="home-quick-nav">
+          <!-- Local-only UI preview: simulates the appearance after a host starts the game. -->
+          <div id="active-game-preview" class="active-game-preview hidden" aria-live="polite">
+            <div class="active-game-heading">
+              <div>
+                <p class="active-game-eyebrow">LIVE TRANSMISSION</p>
+                <h2>Signal Hunt is active</h2>
+              </div>
+              <span class="active-live-badge"><span aria-hidden="true"></span> GAME ACTIVE</span>
+            </div>
+
+            <div class="active-level-strip">
+              <span>LEVEL 01 <span aria-hidden="true">/</span> 04</span>
+              <span>STATUS: IN PROGRESS</span>
+            </div>
+
+            <article id="active-challenge-card" class="active-challenge-card">
+              <div class="active-card-topline">
+                <span class="active-card-eyebrow">CURRENT CHALLENGE</span>
+                <span class="active-challenge-index">01</span>
+              </div>
+              <div class="active-challenge-main">
+                <div class="active-signal-mark" aria-hidden="true">· — · ·</div>
+                <h3>Morse Code</h3>
+                <p>Solve the clue at your station, then enter the unique code printed inside your team's envelope.</p>
+                <div class="active-stage-track" aria-label="Challenge stages">
+                  <div class="active-stage current"><span>01</span><small>Morse</small></div>
+                  <div class="active-stage"><span>02</span><small>Binary</small></div>
+                  <div class="active-stage"><span>03</span><small>FSK</small></div>
+                  <div class="active-stage"><span>04</span><small>Final</small></div>
+                </div>
+                <button id="preview-station-open" class="btn-cta active-code-cta" type="button">
+                  <span>Preview Station Code Screen</span><span class="arrow" aria-hidden="true">→</span>
+                </button>
+              </div>
+            </article>
+
+            <article id="station-code-preview" class="station-code-preview hidden">
+              <div class="station-code-icon" aria-hidden="true">⌁</div>
+              <p class="active-card-eyebrow">STATION VERIFICATION</p>
+              <h3>Enter Station Code</h3>
+              <p>Enter the unique code printed inside your team's station envelope.</p>
+              <label for="preview-station-code">Station code</label>
+              <input id="preview-station-code" class="field-input" type="text" placeholder="e.g. X7KP4M" maxlength="12" autocomplete="off" />
+              <button id="preview-code-back" class="btn-modal-cta" type="button">Back to active game</button>
+              <p class="prototype-preview-note">Visual preview only — code verification is not connected yet.</p>
+            </article>
+
+            <div class="active-game-footer">
+              <p class="prototype-preview-note">DEMO PREVIEW ONLY · This does not start a real game or contact the backend.</p>
+              <button id="preview-host-reset" class="preview-return-btn" type="button">← Return to waiting room preview</button>
+            </div>
+          </div>
+
+          <!-- Home quick navigation: consistent lime icons, parchment labels -->
+          <div id="home-quick-nav" class="home-quick-nav">
             <button class="quick-tile" onclick="Nav.switchTo('mission')" type="button">
-              <div class="quick-tile-icon" aria-hidden="true">📋</div>
-              <div class="quick-tile-text">
+              <span class="quick-tile-icon" aria-hidden="true">▤</span>
+              <span class="quick-tile-text">
                 <span class="tile-label">Mission</span>
                 <span class="tile-sub">Event story &amp; flow</span>
-              </div>
+              </span>
             </button>
             <button class="quick-tile" onclick="Nav.switchTo('knowledge')" type="button">
-              <div class="quick-tile-icon" aria-hidden="true">📖</div>
-              <div class="quick-tile-text">
+              <span class="quick-tile-icon" aria-hidden="true">◫</span>
+              <span class="quick-tile-text">
                 <span class="tile-label">Knowledge</span>
-                <span class="tile-sub">Reference sheets</span>
-              </div>
+                <span class="tile-sub">Signal reference sheets</span>
+              </span>
             </button>
             <button class="quick-tile" onclick="Nav.switchTo('rules')" type="button">
-              <div class="quick-tile-icon" aria-hidden="true">✅</div>
-              <div class="quick-tile-text">
+              <span class="quick-tile-icon quick-tile-icon-check" aria-hidden="true">✓</span>
+              <span class="quick-tile-text">
                 <span class="tile-label">Rules</span>
                 <span class="tile-sub">Important guidelines</span>
-              </div>
+              </span>
             </button>
-            <button class="quick-tile" onclick="Nav.switchTo('mission')" type="button">
-              <div class="quick-tile-icon" aria-hidden="true">🗺</div>
-              <div class="quick-tile-text">
+            <button class="quick-tile" id="home-profile-tile" type="button">
+              <span class="quick-tile-icon" aria-hidden="true">♙</span>
+              <span class="quick-tile-text">
+                <span class="tile-label">Team Profile</span>
+                <span class="tile-sub">Team colour &amp; status</span>
+              </span>
+            </button>
+            <button class="quick-tile quick-tile-map" onclick="Nav.switchTo('campus-map')" type="button">
+              <span class="quick-tile-icon" aria-hidden="true">⌖</span>
+              <span class="quick-tile-text">
                 <span class="tile-label">Campus Map</span>
-                <span class="tile-sub">View campus map</span>
-              </div>
+                <span class="tile-sub">View college map</span>
+              </span>
             </button>
           </div>
-
         </div><!-- /.waiting-room -->
       </section><!-- /#section-home -->
 
@@ -261,275 +324,118 @@
       <!-- ═══════════════════════════════════════════════════
            MISSION SECTION
            ═══════════════════════════════════════════════════ -->
-      <section
-        id="section-mission"
-        class="section"
-        aria-label="Mission"
-        aria-hidden="true"
-      >
+            <!-- MISSION SECTION -->
+      <section id="section-mission" class="section" aria-label="Mission" aria-hidden="true">
         <div class="section-header">
           <h2>Mission</h2>
           <span class="section-id">SH-02</span>
         </div>
 
-        <div class="mission-layout">
-          <!-- Left column -->
-          <div class="mission-left">
+        <article class="sh-mission-card">
+          <div class="image-placeholder sh-mission-hero" role="img" aria-label="Mission image placeholder">
+            <span>IMAGE</span>
+          </div>
+          <div class="sh-mission-copy">
+            <p class="sh-eyebrow">The Mission</p>
+            <p class="sh-mission-description">Decode the signals, follow the clues, reach the checkpoints and complete all four challenges. Use your knowledge, teamwork and observation to reach the final destination.</p>
+          </div>
 
-            <!-- Story panel -->
-            <div class="mission-story">
-              <p class="story-eyebrow">Briefing</p>
-              <h2>The Mission</h2>
-              <p>
-                Decode the signals, follow the clues, reach the checkpoints and complete all
-                four challenges. Use your knowledge, teamwork, and observation to reach the
-                final destination.
-              </p>
-            </div>
-
-            <!-- Campus map placeholder -->
-            <div
-              class="map-placeholder"
-              role="img"
-              aria-label="Campus map — placeholder. Real layout will be added later."
-            >
-              <div class="map-icon" aria-hidden="true">🗺</div>
-              <div class="map-title">2D Campus Map</div>
-              <p class="map-sub">
-                ⚠ Placeholder — real campus layout not yet digitised.<br />
-                An accurate map will be added in a future update.
-              </p>
-              <div class="map-corner-tag">MAP v0.0 · NOT TO SCALE</div>
-            </div>
-
-          </div><!-- /.mission-left -->
-
-          <!-- Right column -->
-          <div class="mission-right">
-
-            <!-- Station list -->
-            <div class="stations-panel">
-              <div class="stations-panel-header">The Four Stations</div>
-              <div class="station-item">
-                <div class="station-num">01</div>
-                <div class="station-name">Station 1</div>
-                <div class="station-arrow" aria-hidden="true">›</div>
-              </div>
-              <div class="station-item">
-                <div class="station-num">02</div>
-                <div class="station-name">Station 2</div>
-                <div class="station-arrow" aria-hidden="true">›</div>
-              </div>
-              <div class="station-item">
-                <div class="station-num">03</div>
-                <div class="station-name">Station 3</div>
-                <div class="station-arrow" aria-hidden="true">›</div>
-              </div>
-              <div class="station-item">
-                <div class="station-num">04</div>
-                <div class="station-name">Final Challenge</div>
-                <div class="station-arrow" aria-hidden="true">›</div>
-              </div>
-            </div>
-
-          </div><!-- /.mission-right -->
-        </div><!-- /.mission-layout -->
+          <div class="sh-stations-header">The Four Stations</div>
+          <div class="sh-stations-list" aria-label="The four stations">
+            <div class="sh-station-row"><span class="sh-station-number">01</span><span class="sh-station-name">Morse Code</span><span class="sh-station-arrow" aria-hidden="true">›</span></div>
+            <div class="sh-station-row"><span class="sh-station-number">02</span><span class="sh-station-name">Binary ASCII</span><span class="sh-station-arrow" aria-hidden="true">›</span></div>
+            <div class="sh-station-row"><span class="sh-station-number">03</span><span class="sh-station-name">FSK Signals</span><span class="sh-station-arrow" aria-hidden="true">›</span></div>
+            <div class="sh-station-row"><span class="sh-station-number">04</span><span class="sh-station-name">Final Challenge</span><span class="sh-station-arrow" aria-hidden="true">›</span></div>
+          </div>
+        </article>
       </section><!-- /#section-mission -->
 
 
       <!-- ═══════════════════════════════════════════════════
            KNOWLEDGE SECTION
            ═══════════════════════════════════════════════════ -->
-      <section
-        id="section-knowledge"
-        class="section"
-        aria-label="Knowledge Base"
-        aria-hidden="true"
-      >
+            <!-- KNOWLEDGE SECTION -->
+      <section id="section-knowledge" class="section" aria-label="Knowledge" aria-hidden="true">
         <div class="section-header">
           <h2>Knowledge</h2>
           <span class="section-id">SH-03</span>
         </div>
 
-        <div class="knowledge-layout">
-
-          <!-- Sidebar (desktop only — hidden on mobile via CSS) -->
-          <nav class="knowledge-sidebar" aria-label="Knowledge topics">
-            <button class="knowledge-nav-item active" data-pane="morse"     type="button">
-              <div class="kn-icon" aria-hidden="true">∿∿</div>
-              Morse Code
+        <div class="knowledge-layout sh-knowledge-layout">
+          <nav class="knowledge-sidebar sh-knowledge-index" aria-label="Knowledge topics">
+            <button class="knowledge-nav-item sh-knowledge-card active" data-pane="morse" type="button">
+              <span class="image-placeholder sh-knowledge-thumb" role="img" aria-label="Morse Code image placeholder"><span>IMAGE</span></span>
+              <span class="sh-knowledge-copy"><strong>Morse Code</strong><small>Dots, dashes and letter decoding</small><span class="sh-view-reference">View Reference <b aria-hidden="true">›</b></span></span>
             </button>
-            <button class="knowledge-nav-item" data-pane="binary"    type="button">
-              <div class="kn-icon" aria-hidden="true">01</div>
-              Binary ASCII
+            <button class="knowledge-nav-item sh-knowledge-card" data-pane="binary" type="button">
+              <span class="image-placeholder sh-knowledge-thumb" role="img" aria-label="Binary ASCII image placeholder"><span>IMAGE</span></span>
+              <span class="sh-knowledge-copy"><strong>Binary ASCII</strong><small>8-bit sequences and text conversion</small><span class="sh-view-reference">View Reference <b aria-hidden="true">›</b></span></span>
             </button>
-            <button class="knowledge-nav-item" data-pane="fsk"       type="button">
-              <div class="kn-icon" aria-hidden="true">∿▲</div>
-              FSK Signals
+            <button class="knowledge-nav-item sh-knowledge-card" data-pane="fsk" type="button">
+              <span class="image-placeholder sh-knowledge-thumb" role="img" aria-label="FSK Signals image placeholder"><span>IMAGE</span></span>
+              <span class="sh-knowledge-copy"><strong>FSK Signals</strong><small>Frequency changes and waveform reference</small><span class="sh-view-reference">View Reference <b aria-hidden="true">›</b></span></span>
             </button>
-            <button class="knowledge-nav-item" data-pane="tips"      type="button">
-              <div class="kn-icon" aria-hidden="true">💡</div>
-              Extra Tips
+            <button class="knowledge-nav-item sh-knowledge-card" data-pane="tips" type="button">
+              <span class="image-placeholder sh-knowledge-thumb" role="img" aria-label="Extra Tips image placeholder"><span>IMAGE</span></span>
+              <span class="sh-knowledge-copy"><strong>Extra Tips</strong><small>Useful information and examples</small><span class="sh-view-reference">View Reference <b aria-hidden="true">›</b></span></span>
             </button>
           </nav>
 
-          <!-- Content panes -->
-          <div class="knowledge-content">
-
-            <!-- Morse Code -->
-            <div class="knowledge-pane active" id="pane-morse">
-              <div class="pane-title">Morse Code</div>
-              <div class="pane-sub">Dots, dashes and letter decoding</div>
-              <div class="pane-body">
-                <p>
-                  Morse code represents letters and numbers using short signals (dots <strong>·</strong>)
-                  and long signals (dashes <strong>—</strong>).
-                  Each letter is separated by a small gap; words by a larger gap.
-                </p>
-                <br />
-                <p><strong>Key letters:</strong></p>
-                <p style="font-family:var(--font-mono); font-size:0.8rem; line-height:2; color:var(--text-on-dark);">
-                  A · —&nbsp;&nbsp; B — · · ·&nbsp;&nbsp; C — · — ·&nbsp;&nbsp; D — · ·<br />
-                  E ·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; F · · — ·&nbsp;&nbsp; G — — ·&nbsp;&nbsp;&nbsp; H · · · ·<br />
-                  I · ·&nbsp;&nbsp;&nbsp;&nbsp; J · — — —&nbsp; K — · —&nbsp;&nbsp;&nbsp; L · — · ·<br />
-                  M — —&nbsp;&nbsp;&nbsp; N — ·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O — — —&nbsp;&nbsp; P · — — ·<br />
-                  S · · ·&nbsp;&nbsp; T —&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; U · · —&nbsp;&nbsp;&nbsp; V · · · —
-                </p>
-              </div>
-            </div>
-
-            <!-- Binary ASCII -->
-            <div class="knowledge-pane" id="pane-binary">
-              <div class="pane-title">Binary ASCII</div>
-              <div class="pane-sub">8-bit sequences and text conversion</div>
-              <div class="pane-body">
-                <p>
-                  ASCII maps characters to numbers. Binary represents those numbers in base-2.
-                  Each character = 8 bits (one byte).
-                </p>
-                <br />
-                <p><strong>Examples:</strong></p>
-                <p style="font-family:var(--font-mono); font-size:0.8rem; line-height:2; color:var(--text-on-dark);">
-                  A = 65 = 01000001<br />
-                  B = 66 = 01000010<br />
-                  Z = 90 = 01011010<br />
-                  0 = 48 = 00110000<br />
-                  Space = 32 = 00100000
-                </p>
-                <br />
-                <p>To decode: convert each 8-bit group to decimal, then look up the ASCII table.</p>
-              </div>
-            </div>
-
-            <!-- FSK Signals -->
-            <div class="knowledge-pane" id="pane-fsk">
-              <div class="pane-title">FSK Signals</div>
-              <div class="pane-sub">Frequency changes and waveform reference</div>
-              <div class="pane-body">
-                <p>
-                  FSK (Frequency-Shift Keying) encodes data by switching between two frequencies.
-                  A higher frequency represents a 1 (mark) and a lower frequency represents a 0 (space).
-                </p>
-                <br />
-                <p><strong>Remember:</strong></p>
-                <p style="font-family:var(--font-mono); font-size:0.82rem; line-height:2; color:var(--text-on-dark);">
-                  High tone → 1 (mark)<br />
-                  Low tone  → 0 (space)<br />
-                  Decode the sequence → convert binary → ASCII
-                </p>
-                <br />
-                <p>Listen carefully to the frequency shifts at each station.</p>
-              </div>
-            </div>
-
-            <!-- Extra Tips -->
-            <div class="knowledge-pane" id="pane-tips">
-              <div class="pane-title">Extra Tips</div>
-              <div class="pane-sub">Useful information and examples</div>
-              <div class="pane-body">
-                <p><strong>General advice for the hunt:</strong></p>
-                <br />
-                <p>• Split roles in your team: one person records, one decodes, one navigates.</p>
-                <br />
-                <p>• Always double-check your decoded answer before submitting — mistakes cost time.</p>
-                <br />
-                <p>• If you are stuck at a station, move on and return later.</p>
-                <br />
-                <p>• Stay calm. Speed matters, but accuracy matters more.</p>
-                <br />
-                <p>• Keep this Knowledge section open on one device throughout the game.</p>
-              </div>
-            </div>
-
-          </div><!-- /.knowledge-content -->
-        </div><!-- /.knowledge-layout -->
+          <div class="knowledge-content sh-knowledge-content">
+            <article class="knowledge-pane active" id="pane-morse">
+              <div class="sh-reference-heading"><div><div class="pane-title">Morse Code</div><div class="pane-sub">Reference Image</div></div><button class="sh-reference-back" type="button">← Back to topics</button></div>
+              <div class="pane-body"><div class="image-placeholder sh-reference-image" role="img" aria-label="Morse Code reference image placeholder"><span>IMAGE</span></div></div>
+            </article>
+            <article class="knowledge-pane" id="pane-binary">
+              <div class="sh-reference-heading"><div><div class="pane-title">Binary ASCII</div><div class="pane-sub">Reference Image</div></div><button class="sh-reference-back" type="button">← Back to topics</button></div>
+              <div class="pane-body"><div class="image-placeholder sh-reference-image" role="img" aria-label="Binary ASCII reference image placeholder"><span>IMAGE</span></div></div>
+            </article>
+            <article class="knowledge-pane" id="pane-fsk">
+              <div class="sh-reference-heading"><div><div class="pane-title">FSK Signals</div><div class="pane-sub">Reference Image</div></div><button class="sh-reference-back" type="button">← Back to topics</button></div>
+              <div class="pane-body"><div class="image-placeholder sh-reference-image" role="img" aria-label="FSK reference image placeholder"><span>IMAGE</span></div></div>
+            </article>
+            <article class="knowledge-pane" id="pane-tips">
+              <div class="sh-reference-heading"><div><div class="pane-title">Extra Tips</div><div class="pane-sub">Reference Image</div></div><button class="sh-reference-back" type="button">← Back to topics</button></div>
+              <div class="pane-body"><div class="image-placeholder sh-reference-image" role="img" aria-label="Extra Tips reference image placeholder"><span>IMAGE</span></div></div>
+            </article>
+          </div>
+        </div>
       </section><!-- /#section-knowledge -->
 
 
       <!-- ═══════════════════════════════════════════════════
            RULES SECTION
            ═══════════════════════════════════════════════════ -->
-      <section
-        id="section-rules"
-        class="section"
-        aria-label="Rules"
-        aria-hidden="true"
-      >
+            <!-- RULES SECTION -->
+      <section id="section-rules" class="section" aria-label="Rules and Guidelines" aria-hidden="true">
         <div class="section-header">
           <h2>Rules &amp; Guidelines</h2>
           <span class="section-id">SH-04</span>
         </div>
 
-        <ol class="rules-list" aria-label="Game rules">
-
-          <li>
-            <div class="rule-icon" aria-hidden="true">📋</div>
-            <div class="rule-content">
-              <strong>Game Rules</strong>
-              <p>Follow the event instructions at all times. All signal stations are within the campus boundary. Teams must not leave the campus during the game.</p>
-            </div>
-          </li>
-
-          <li>
-            <div class="rule-icon" aria-hidden="true">⚠️</div>
-            <div class="rule-content">
-              <strong>Zero-Warning Policy</strong>
-              <p>Violations of the rules may result in direct elimination without a prior warning. Decisions by organisers are final and binding.</p>
-            </div>
-          </li>
-
-          <li>
-            <div class="rule-icon" aria-hidden="true">🏫</div>
-            <div class="rule-content">
-              <strong>Safety Guidelines</strong>
-              <p>Stay within designated campus zones. Do not tamper with, remove, or damage any station markers or equipment. Replacements will not be provided mid-game.</p>
-            </div>
-          </li>
-
-          <li>
-            <div class="rule-icon" aria-hidden="true">🤝</div>
-            <div class="rule-content">
-              <strong>Fair Play</strong>
-              <p>Do not share codes with other teams. Using another team's code is cheating and leads to disqualification. All teams start simultaneously — no head-starts.</p>
-            </div>
-          </li>
-
-          <li>
-            <div class="rule-icon" aria-hidden="true">📝</div>
-            <div class="rule-content">
-              <strong>General Instructions</strong>
-              <p>One device per team for this platform. Personal phones are permitted for navigation only. If an organiser signals a pause, all teams must halt immediately.</p>
-            </div>
-          </li>
-
+        <ol class="rules-list sh-rules-list">
+          <li class="sh-rule-card"><span class="sh-rule-icon">◷</span><div class="rule-content"><strong>Game Rules</strong><p>Follow the host and volunteer instructions. Complete the challenges in the assigned order.</p></div></li>
+          <li class="sh-rule-card"><span class="sh-rule-icon sh-rule-check">✓</span><div class="rule-content"><strong>Zero-Warning Policy</strong><p>Rule violations may result in immediate elimination without a prior warning.</p></div></li>
+          <li class="sh-rule-card"><span class="sh-rule-icon">⬡</span><div class="rule-content"><strong>Safety Guidelines</strong><p>Stay in approved campus areas. Do not enter restricted spaces or interfere with college property.</p></div></li>
+          <li class="sh-rule-card"><span class="sh-rule-icon">✕</span><div class="rule-content"><strong>Fair Play</strong><p>Do not share station codes or clues with other teams.</p></div></li>
+          <li class="sh-rule-card"><span class="sh-rule-icon">✦</span><div class="rule-content"><strong>General Instructions</strong><p>Keep your team together and report any issue to the event volunteers.</p></div></li>
         </ol>
-
-        <div class="rules-footer">
-          <strong>NOTE:</strong> These rules are a draft for prototype review.
-          Final rules will be confirmed by the Nexus Vyoma 2026 organising committee.
-        </div>
-
+        <p class="sh-rules-note">DRAFT RULES · Final wording should be confirmed by the event organisers.</p>
       </section><!-- /#section-rules -->
+
+      <!-- CAMPUS MAP SECTION: the real image will be added later -->
+      <section id="section-campus-map" class="section" aria-label="Campus Map" aria-hidden="true">
+        <div class="section-header">
+          <h2>Campus Map</h2>
+          <span class="section-id">SH-05</span>
+        </div>
+        <article class="sh-map-card">
+          <p class="sh-map-title">College Campus Map</p>
+          <div class="image-placeholder sh-campus-map-image" role="img" aria-label="College campus map image placeholder"><span>IMAGE</span></div>
+          <p class="sh-map-note">The accurate college map will be added here later.</p>
+          <button class="sh-map-back" type="button" onclick="Nav.switchTo('home')">← Back to Home</button>
+        </article>
+      </section><!-- /#section-campus-map -->
 
     </main><!-- /#main-content -->
 

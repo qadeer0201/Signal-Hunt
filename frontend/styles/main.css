@@ -1,172 +1,359 @@
 /* =============================================================
-   Signal Hunt — Main Design System
-   Theme: campus mystery / detective dossier
+   main.css — Signal Hunt Design System v2
+   Investigation / campus-mystery aesthetic
+   Dark charcoal backgrounds · Parchment panels · Lime-green accents
    ============================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Share+Tech+Mono&display=swap');
 
+/* ── Design Tokens ── */
 :root {
-  --bg: #0a0b09;
-  --bg-alt: #10120e;
-  --bg-surface: #151812;
-  --bg-surface-raised: #1b1f16;
-  --panel: #f3e8c9;
-  --panel-light: #fbf2d8;
-  --panel-deep: #e8d9b3;
-  --text-on-light: #191a13;
-  --text-dim-light: #55503e;
-  --text-on-dark: #f3e8c9;
-  --text-dim-dark: #c0b99e;
-  --text-faint: #918b74;
-  --lime: #d8ff36;
-  --lime-dim: #bde52b;
-  --lime-soft: rgba(216, 255, 54, .12);
-  --lime-line: rgba(216, 255, 54, .36);
-  --red: #d94141;
-  --red-soft: rgba(217, 65, 65, .12);
-  --border-dark: #34382a;
-  --border-light: #d0c19b;
-  --font-display: 'Barlow Condensed', Impact, 'Arial Narrow', sans-serif;
-  --font-body: 'DM Sans', Arial, sans-serif;
-  --font-mono: 'IBM Plex Mono', Consolas, monospace;
-  --radius-xs: 5px;
-  --radius-sm: 8px;
-  --radius-md: 13px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
-  --shadow-card: 0 12px 28px rgba(0, 0, 0, .23);
-  --shadow-float: 0 18px 55px rgba(0, 0, 0, .45);
-  --transition: 180ms ease;
+  /* Backgrounds */
+  --bg:           #111210;
+  --bg-alt:       #181a16;
+  --bg-surface:   #1e2119;
+
+  /* Panels (parchment / cream) */
+  --panel:        #f5f0e8;
+  --panel-warm:   #ede8dc;
+  --panel-dark:   #1e2119;
+
+  /* Text */
+  --text-on-light: #1a1c18;
+  --text-dim-light: #4a4a40;
+  --text-on-dark:  #e8e4d8;
+  --text-dim-dark: #8a8878;
+  --text-faint:    #4e5248;
+
+  /* Accents */
+  --lime:         #c8f135;   /* primary highlight */
+  --lime-dim:     #a8cc28;
+  --lime-glow:    rgba(200,241,53,0.18);
+
+  /* Alert */
+  --red:          #d94141;
+  --red-dim:      rgba(217,65,65,0.12);
+
+  /* Borders */
+  --border-dark:  #2e3228;
+  --border-light: #d0c8b8;
+  --border-lime:  rgba(200,241,53,0.35);
+
+  /* Typography */
+  --font-display: 'Oswald', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'Share Tech Mono', monospace;
+
+  /* Spacing & shape */
+  --radius-sm:  4px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --radius-xl:  22px;
+
+  --transition: 0.2s ease;
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.25);
+  --shadow-md:  0 4px 20px rgba(0,0,0,0.4);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.55);
 }
 
+/* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { min-height: 100%; font-size: 16px; scroll-behavior: smooth; }
+html { font-size: 16px; scroll-behavior: smooth; }
+
 body {
-  min-height: 100dvh;
-  overflow-x: hidden;
-  color: var(--text-on-dark);
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(ellipse at 50% -20%, rgba(78, 96, 39, .22), transparent 58%),
-    repeating-linear-gradient(135deg, rgba(216,255,54,.018) 0, rgba(216,255,54,.018) 1px, transparent 1px, transparent 22px);
+  background:  var(--bg);
+  color:       var(--text-on-dark);
   font-family: var(--font-body);
-  font-size: 15px;
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  font-size:   1rem;
+  line-height: 1.6;
+  min-height:  100dvh;
+  overflow-x:  hidden;
+  /* Paper-grain texture via SVG noise */
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, #1f2818 0%, transparent 65%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 300px 300px;
 }
 
-button, input, select, textarea { font: inherit; }
-button { -webkit-tap-highlight-color: transparent; }
-button:focus-visible, input:focus-visible, a:focus-visible {
-  outline: 2px solid var(--lime);
-  outline-offset: 3px;
-}
-button:disabled { cursor: not-allowed; opacity: .55; }
-img, svg { max-width: 100%; }
-
-::selection { color: var(--bg); background: var(--lime); }
-::-webkit-scrollbar { width: 8px; height: 8px; }
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: #424735; border: 2px solid var(--bg); border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 99px; }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-display);
-  line-height: 1.05;
-  font-weight: 700;
-  text-wrap: balance;
+/* ── Typography ── */
+h1 {
+  font-family:    var(--font-display);
+  font-weight:    700;
+  letter-spacing: 0.05em;
+  line-height:    1.1;
+  color:          var(--lime);
 }
-h1 { letter-spacing: .035em; }
-h2 { letter-spacing: .045em; }
-h3 { letter-spacing: .035em; }
-p { line-height: 1.65; }
-code, .mono { font-family: var(--font-mono); }
+h2 {
+  font-family:    var(--font-display);
+  font-weight:    600;
+  letter-spacing: 0.04em;
+  line-height:    1.2;
+}
+h3 {
+  font-family:    var(--font-display);
+  font-weight:    500;
+  letter-spacing: 0.04em;
+  line-height:    1.3;
+}
+p   { font-size: 0.9rem; line-height: 1.7; }
+code, .mono { font-family: var(--font-mono); font-size: 0.875rem; }
 
+/* ── Utility ── */
 .hidden { display: none !important; }
-.section { display: none; animation: sectionIn .24s ease both; }
-.section--active { display: block; }
-@keyframes sectionIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes softPulse {
-  0%, 100% { opacity: .78; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.035); }
-}
-@keyframes dotPulse {
-  0%, 100% { opacity: .3; }
-  50% { opacity: 1; }
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-5px); }
-  40%, 80% { transform: translateX(5px); }
-}
-.shake { animation: shake .38s ease; }
 
-/* Gentle terminal texture. Purely decorative and never blocks interaction. */
+/* ── SPA sections ── */
+.section { display: none; animation: sectionIn 0.28s ease; }
+.section--active { display: block; }
+
+@keyframes sectionIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Parchment panel (warm cream background) ── */
+.parchment {
+  background:    var(--panel);
+  color:         var(--text-on-light);
+  border-radius: var(--radius-lg);
+  box-shadow:    var(--shadow-md);
+  position:      relative;
+  overflow:      hidden;
+}
+.parchment-warm {
+  background: var(--panel-warm);
+}
+
+/* ── Dark panel ── */
+.dark-panel {
+  background:    var(--bg-surface);
+  border:        1px solid var(--border-dark);
+  border-radius: var(--radius-lg);
+  color:         var(--text-on-dark);
+}
+
+/* ── Scanline overlay ── */
 #scanline {
   pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
-  opacity: .24;
-  background: repeating-linear-gradient(0deg, transparent 0, transparent 4px, rgba(0,0,0,.08) 4px, rgba(0,0,0,.08) 5px);
+  position:       fixed;
+  inset:          0;
+  z-index:        9000;
+  background:     repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.04) 3px,
+    rgba(0,0,0,0.04) 4px
+  );
 }
 
-.parchment {
-  background: var(--panel);
-  color: var(--text-on-light);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
-.parchment-warm { background: var(--panel-deep); }
-.dark-panel {
-  color: var(--text-on-dark);
-  background: var(--bg-surface);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius-lg);
-}
-
+/* ── Status badges ── */
 .status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
-  padding: .42rem .7rem;
-  border-radius: 6px;
-  font-family: var(--font-mono);
-  font-size: .68rem;
-  font-weight: 600;
-  letter-spacing: .055em;
-  line-height: 1.3;
+  display:        inline-flex;
+  align-items:    center;
+  gap:            0.4rem;
+  padding:        0.35rem 0.85rem;
+  border-radius:  var(--radius-sm);
+  font-family:    var(--font-display);
+  font-size:      0.78rem;
+  font-weight:    600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 .status-wait {
-  color: var(--lime);
-  background: rgba(216,255,54,.075);
-  border: 1px solid var(--lime-line);
+  background: rgba(200,241,53,0.12);
+  color:      var(--lime);
+  border:     1px solid var(--border-lime);
 }
 .status-live {
-  color: #ff9292;
-  background: var(--red-soft);
-  border: 1px solid rgba(217,65,65,.46);
+  background: var(--red-dim);
+  color:      #ff8080;
+  border:     1px solid rgba(217,65,65,0.4);
 }
 
-.label-micro {
-  color: var(--text-faint);
-  font: 500 .64rem/1.4 var(--font-mono);
-  letter-spacing: .16em;
-  text-transform: uppercase;
+/* ── Shake animation (login error) ── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-7px); }
+  40%       { transform: translateX(7px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
 }
-.label-micro-light { color: var(--text-dim-light); }
-.divider { height: 1px; margin: 1rem 0; background: linear-gradient(90deg, var(--border-light), transparent); }
-.divider-dark { background: linear-gradient(90deg, var(--border-dark), transparent); }
-.container { width: 100%; max-width: 1120px; margin-inline: auto; padding-inline: 1rem; }
+.shake { animation: shake 0.5s ease; }
+
+/* ── Pulse (standby) ── */
+@keyframes softPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.05); }
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50%       { opacity: 1;   transform: scale(1); }
+}
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-light), transparent);
+  margin: 1rem 0;
+}
+.divider-dark {
+  background: linear-gradient(90deg, var(--border-dark), transparent);
+}
+
+/* ── Label micro-text ── */
+.label-micro {
+  font-family:    var(--font-mono);
+  font-size:      0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color:          var(--text-dim-dark);
+}
+.label-micro-light {
+  color: var(--text-dim-light);
+}
+
+/* ── Responsive container ── */
+.container {
+  width:     100%;
+  max-width: 900px;
+  margin:    0 auto;
+  padding:   0 1rem;
+}
+
+/* ── Chevron icon (for list items) ── */
+.chevron::after {
+  content:  '›';
+  font-size: 1.1rem;
+  color:    var(--text-dim-dark);
+}
+
+/* ── Utility flex ── */
 .flex { display: flex; }
 .items-center { align-items: center; }
-.gap-sm { gap: .5rem; }
-.gap-md { gap: 1rem; }
+.gap-sm  { gap: 0.5rem; }
+.gap-md  { gap: 1rem; }
+.gap-lg  { gap: 1.5rem; }
+.w-full  { width: 100%; }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+/* ── Modal overlay ── */
+.modal-overlay {
+  position:   fixed;
+  inset:      0;
+  z-index:    500;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(3px);
+  display:    flex;
+  align-items: center;
+  justify-content: center;
+  padding:    1rem;
+  animation:  fadeIn 0.2s ease;
+}
+.modal-overlay.hidden { display: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Responsive page content ── */
+.page-content {
+  flex:      1;
+  padding:   1.25rem 1rem 6rem;  /* bottom for mobile nav */
+  max-width: 900px;
+  margin:    0 auto;
+  width:     100%;
+}
+@media (min-width: 700px) {
+  .page-content { padding-bottom: 2rem; }
+}
+
+/* Signal Hunt UI reference-match polish: tokens and base layout */
+:root {
+  --bg: #090b08;
+  --bg-alt: #12150f;
+  --bg-surface: #171a12;
+  --panel: #f3e7c7;
+  --panel-warm: #e9d9b3;
+  --panel-dark: #171a12;
+  --text-on-light: #181912;
+  --text-dim-light: #514b3c;
+  --text-on-dark: #f3e7c7;
+  --text-dim-dark: #c1bca8;
+  --text-faint: #9d9a84;
+  --lime: #d8ff36;
+  --lime-dim: #bddb2c;
+  --lime-glow: rgba(216,255,54,.20);
+  --red: #d94141;
+  --red-dim: rgba(217,65,65,.12);
+  --border-dark: #383d2e;
+  --border-light: #d1c19b;
+  --border-lime: rgba(216,255,54,.42);
+  --font-display: 'Oswald', 'Arial Narrow', Impact, sans-serif;
+  --font-body: 'Inter', Arial, sans-serif;
+  --font-mono: 'Share Tech Mono', Consolas, monospace;
+  --radius-sm: 7px;
+  --radius-md: 10px;
+  --radius-lg: 13px;
+  --radius-xl: 17px;
+  --shadow-sm: 0 4px 12px rgba(0,0,0,.18);
+  --shadow-md: 0 9px 24px rgba(0,0,0,.24);
+  --shadow-lg: 0 20px 50px rgba(0,0,0,.42);
+  --transition: .18s ease;
+}
+
+html { background: var(--bg); }
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 90% 38% at 50% 0%, rgba(66,82,32,.19), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(216,255,54,.012) 0, rgba(216,255,54,.012) 1px, transparent 1px, transparent 25px);
+  color: var(--text-on-dark);
+  font-size: 15px;
+}
+#scanline { opacity: .28; }
+.page-content {
+  max-width: 1080px;
+  padding: 1.25rem 1rem 6.25rem;
+}
+@media (min-width: 700px) {
+  .page-content { padding: 1.6rem 1.5rem 2.4rem; }
+}
+
+/* Crisper headings and readable secondary labels */
+h1, h2, h3, h4 { text-wrap: balance; }
+.label-micro, .section-id { color: var(--text-dim-dark); }
+:focus-visible { outline-color: var(--lime); }
+
+
+/* =============================================================
+   SIGNAL HUNT — User-provided distressed logo background
+   Applied behind the entire app; overlays preserve readability.
+   ============================================================= */
+body {
+  position: relative;
+  isolation: isolate;
+  background: #070805 !important;
+  background-image: none !important;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(180deg, rgba(5,6,4,.60) 0%, rgba(5,6,4,.72) 50%, rgba(5,6,4,.82) 100%),
+    url("../assets/signal-hunt-background.webp");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+@media (max-width: 640px) {
+  body::before { background-position: 50% 50%; }
 }

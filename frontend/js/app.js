@@ -86,6 +86,7 @@ const App = (() => {
     _renderTeamProfile(session);
     Nav.init();
     _initKnowledgeSidebar();
+    _initGamePreview();
   }
 
   // -------------------------------------------------------------------------
@@ -173,24 +174,80 @@ const App = (() => {
   }
 
   // -------------------------------------------------------------------------
+  // Internal: Local-only demo control to preview the UI after host start.
+  // This does not contact the backend or start a real event.
+  // -------------------------------------------------------------------------
+  function _initGamePreview() {
+    const startButton = document.getElementById("preview-host-start");
+    const resetButton = document.getElementById("preview-host-reset");
+    const openCodeButton = document.getElementById("preview-station-open");
+    const backCodeButton = document.getElementById("preview-code-back");
+    const activeView = document.getElementById("active-game-preview");
+    const challengeView = document.getElementById("active-challenge-card");
+    const stationCodeView = document.getElementById("station-code-preview");
+    const profileTile = document.getElementById("home-profile-tile");
+
+    if (profileTile) {
+      profileTile.addEventListener("click", () => {
+        const profileButton = document.getElementById("profile-btn");
+        if (profileButton) profileButton.click();
+      });
+    }
+
+    function setPreviewStarted(started) {
+      GAME_STATE.started = started;
+      document.body.classList.toggle("demo-game-live", started);
+      if (activeView) activeView.classList.toggle("hidden", !started);
+      if (challengeView) challengeView.classList.remove("hidden");
+      if (stationCodeView) stationCodeView.classList.add("hidden");
+      _renderTeamProfile(Auth.getSession());
+      if (started) Nav.switchTo("home");
+    }
+
+    if (startButton) startButton.addEventListener("click", () => setPreviewStarted(true));
+    if (resetButton) resetButton.addEventListener("click", () => setPreviewStarted(false));
+
+    if (openCodeButton && challengeView && stationCodeView) {
+      openCodeButton.addEventListener("click", () => {
+        challengeView.classList.add("hidden");
+        stationCodeView.classList.remove("hidden");
+      });
+    }
+    if (backCodeButton && challengeView && stationCodeView) {
+      backCodeButton.addEventListener("click", () => {
+        stationCodeView.classList.add("hidden");
+        challengeView.classList.remove("hidden");
+      });
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Internal: Wire the knowledge sidebar tab switching (desktop only)
   // -------------------------------------------------------------------------
   function _initKnowledgeSidebar() {
     const navItems = document.querySelectorAll(".knowledge-nav-item");
     const panes    = document.querySelectorAll(".knowledge-pane");
 
+    const knowledgeSection = document.getElementById("section-knowledge");
+
     navItems.forEach((item) => {
       item.addEventListener("click", () => {
         const paneId = item.dataset.pane;
 
-        // Update active nav item
+        // Update active topic and its corresponding reference pane.
         navItems.forEach((n) => n.classList.remove("active"));
         item.classList.add("active");
+        panes.forEach((p) => p.classList.toggle("active", p.id === `pane-${paneId}`));
 
-        // Show correct pane
-        panes.forEach((p) => {
-          p.classList.toggle("active", p.id === `pane-${paneId}`);
-        });
+        // On phones, replace the topic list with the selected empty IMAGE panel.
+        // On desktop, the topic list and reference panel remain side by side.
+        if (knowledgeSection) knowledgeSection.classList.add("knowledge-reference-open");
+      });
+    });
+
+    document.querySelectorAll(".sh-reference-back").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (knowledgeSection) knowledgeSection.classList.remove("knowledge-reference-open");
       });
     });
   }
