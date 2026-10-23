@@ -1,0 +1,27 @@
+/* Mission content */
+.mission-card { display: flex; flex-direction: column; gap: 13px; padding: 11px; }
+.mission-banner { width: 100%; height: clamp(110px, 27vw, 190px); object-fit: cover; object-position: center 48%; border: 1px solid #c8b990; border-radius: 8px; background: #15170f; }
+.mission-copy { padding: 0 3px; }
+.mission-copy .section-kicker { margin-bottom: 6px; color: #34331f; }
+.mission-copy p:not(.section-kicker) { margin: 0; color: #343023; font-size: .85rem; line-height: 1.55; }
+.stations-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
+.stations-header h3 { margin: 0; color: #232216; font: 900 .79rem var(--display); letter-spacing: .07em; }
+.stations-header > span { color: #6a624b; font: 700 .62rem var(--mono); }
+.station-list { display: flex; flex-direction: column; gap: 7px; }
+.station-row { display: grid; grid-template-columns: 38px minmax(0,1fr) 18px; align-items: center; gap: 9px; min-height: 48px; padding: 6px 8px; border: 1px solid #d1c29d; border-radius: 8px; background: #e7d9b6; }
+.station-number { display: grid; place-items: center; width: 36px; height: 36px; min-width: 36px; min-height: 36px; aspect-ratio: 1/1; border-radius: 5px; background: #11140c; color: #f6eed8; font: 800 .77rem var(--mono); }
+.station-copy { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.station-copy strong { color: #1c1a12; font-size: .82rem; }
+.station-copy small { color: #5e5744; font-size: .65rem; }
+.station-arrow { color: #4f4b39; font-size: 1.25rem; text-align: right; }
+.mission-footer { display: flex; justify-content: space-around; gap: 8px; padding-top: 9px; border-top: 1px solid #d2c39e; color: #666049; font: 700 .58rem var(--mono); letter-spacing: .08em; }
+@media (min-width: 760px) { .mission-card { padding: 17px; gap: 16px; } .mission-copy p:not(.section-kicker) { font-size: .95rem; } .station-row { min-height: 54px; } }
+
+/* Let the mission panel use the page height; station number badges remain square. */
+#view-mission .mission-card { flex: 1 0 auto; }
+@media (max-width: 759px) {
+  #view-mission .mission-card { justify-content: space-between; gap: 11px; }
+  #view-mission .station-list { flex: 1 0 auto; justify-content: space-evenly; }
+  #view-mission .station-row { min-height: 48px; }
+  #view-mission .station-number { width: 36px; height: 36px; min-width: 36px; min-height: 36px; aspect-ratio: 1 / 1; }
+}

@@ -1,0 +1,13 @@
+/* Rules page */
+.rules-panel { padding: 11px; }
+.rules-intro { display: flex; align-items: center; gap: 10px; padding: 5px 4px 12px; border-bottom: 1px solid #d0c19c; }
+.rules-main-icon { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%; background: #16190e; color: var(--lime); font-size: 1.65rem; }
+.rules-intro > div { display: flex; flex-direction: column; gap: 3px; }
+.rules-intro strong { color: #242115; font: 900 .82rem var(--display); letter-spacing: .04em; }
+.rules-intro small { color: #625a44; font-size: .7rem; }
+.rules-list { display: flex; flex-direction: column; gap: 6px; list-style: none; padding: 11px 0 0; margin: 0; }
+.rules-list li { display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #d7c9a4; border-radius: 7px; background: #e9dcbb; color: #242116; font-size: .75rem; line-height: 1.4; }
+.rule-icon { display: grid; place-items: center; width: 31px; height: 31px; flex: 0 0 31px; border-radius: 7px; background: #14170d; color: var(--lime); font: 800 .66rem var(--mono); }
+@media (min-width: 760px) { .rules-panel { padding: 18px; } .rules-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; } .rules-list li { font-size: .83rem; } }
+
+#view-rules .rules-panel { flex: 1 0 auto; }

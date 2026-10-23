@@ -1,0 +1,43 @@
+/* Knowledge index and full-screen reference view */
+.archive-heading { margin: 0 0 9px; padding: 10px 12px; border: 1px solid #464d31; border-radius: 7px; color: var(--lime); background: #10130c; font: 800 .72rem var(--mono); letter-spacing: .08em; }
+.archive-heading span { color: #ccc4aa; letter-spacing: .02em; }
+.knowledge-cards { display: flex; flex-direction: column; gap: 9px; }
+.knowledge-card { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 94px; padding: 10px; border: 1px solid #d1c19b; border-radius: 9px; background: var(--cream); color: var(--ink); text-align: left; cursor: pointer; }
+.knowledge-card:hover, .knowledge-card:focus-visible { border-color: #8eaa22; background: #f9efce; }
+.knowledge-thumb { display: grid; place-items: center; width: 72px; height: 72px; flex: 0 0 72px; overflow: hidden; border: 1px solid #454a32; border-radius: 7px; background: #0d100a; }
+.knowledge-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.knowledge-copy { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 4px; }
+.knowledge-copy strong { color: #201e14; font: 900 .83rem var(--display); letter-spacing: .03em; }
+.knowledge-copy small { color: #4f4837; font-size: .72rem; line-height: 1.45; }
+.view-reference { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 2px; color: #393626; font-size: .7rem; font-weight: 800; }
+.view-reference b { color: #38411e; font-size: 1.1rem; line-height: .8; }
+.knowledge-detail-view { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 10px; }
+.detail-heading { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid #41482f; border-radius: 9px; background: rgba(12,15,8,.95); }
+.detail-heading h3 { margin: 0; color: var(--text); font: 900 1.1rem var(--display); letter-spacing: .06em; }
+.detail-heading .section-kicker { margin-bottom: 3px; }
+.knowledge-explanation { margin: 0; padding: 12px 14px; border: 1px solid #d1c19b; border-radius: 8px; background: var(--cream); color: #393426; font-size: .8rem; line-height: 1.5; }
+.reference-frame { display: flex; align-items: center; justify-content: center; min-height: 200px; padding: 7px; border: 1px solid #d1c19b; border-radius: 10px; background: var(--cream); overflow: hidden; }
+.reference-frame > img { width: 100%; max-height: calc(100dvh - 310px); object-fit: contain; object-position: top center; border-radius: 4px; }
+.reference-frame .image-placeholder { width: 100%; min-height: 240px; background: #11140c; }
+.reference-footnote { margin: 0; color: #c2baa1; font: 600 .62rem var(--mono); text-align: center; }
+@media (max-width: 420px) { .knowledge-card { min-height: 90px; padding: 8px; gap: 9px; } .knowledge-thumb { width: 58px; height: 58px; flex-basis: 58px; } .knowledge-copy strong { font-size: .78rem; } .knowledge-copy small { font-size: .68rem; } .reference-frame > img { max-height: calc(100dvh - 290px); } }
+@media (min-width: 760px) { .knowledge-cards { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); align-items: stretch; } .knowledge-card { min-height: 120px; } .knowledge-thumb { width: 86px; height: 86px; flex-basis: 86px; } .knowledge-detail-view { max-width: 760px; margin-inline: auto; width: 100%; } .reference-frame > img { max-height: 72vh; } }
+
+/* Use the mobile viewport for the topic list/reference area, without fixed card heights. */
+#view-knowledge { flex: 1 0 auto; }
+.knowledge-list-view { display: flex; flex-direction: column; flex: 1 0 auto; min-height: 0; gap: 9px; }
+.knowledge-cards { flex: 1 0 auto; }
+@media (max-width: 759px) {
+  .knowledge-card { flex: 1 0 auto; }
+  .knowledge-detail-view { flex: 1 0 auto; }
+  .reference-frame { flex: 1 0 auto; }
+}
+
+
+/* Full-screen reference viewer. It fits the viewport; there are no zoom controls. */
+.reference-fullscreen-button { min-height: 40px; margin-top: 8px; }
+.reference-lightbox { position: fixed; inset: 0; z-index: 120; display: flex; flex-direction: column; padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)); background: #050604; }
+.reference-lightbox.is-hidden { display: none !important; }
+.reference-lightbox-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex:0 0 auto; padding:7px 2px 12px; color:var(--lime); font:800 .7rem var(--mono); letter-spacing:.12em; }
+.reference-lightbox > img { display:block; width:100%; height:0; min-height:0; flex:1 1 auto; object-fit:contain; object-position:center; background:#050604; }
+@media (min-width:760px) { .reference-lightbox { padding:16px 24px 20px; } .reference-lightbox > img { max-width:1200px; margin-inline:auto; } }

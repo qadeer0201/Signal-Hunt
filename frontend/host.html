@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0b09">
+  <title>Signal Hunt — Host Dashboard (Prototype)</title>
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/pages/host.css">
+</head>
+<body>
+  <main class="host-shell">
+    <header class="host-header">
+      <a class="host-brand" href="index.html"><img src="assets/signal-hunt-logo.webp" alt=""><span><strong>SIGNAL HUNT</strong><small>HOST CONTROL · PROTOTYPE</small></span></a>
+      <a class="btn btn-secondary btn-compact" href="index.html">OPEN PARTICIPANT VIEW ↗</a>
+    </header>
+
+    <section class="host-intro">
+      <p class="section-kicker">ORGANISED TRANSMISSION CONTROL</p>
+      <h1>HOST DASHBOARD</h1>
+      <p>Use this page to preview how an authorised host will start Signal Hunt.</p>
+      <div class="host-warning"><strong>PROTOTYPE ONLY</strong><span>This demo has no host authentication. It syncs only between tabs using the same browser and local origin. It does not start the game on other phones. Do not deploy it as a real host control panel.</span></div>
+    </section>
+
+    <section class="host-status-panel paper-card" aria-live="polite">
+      <div class="host-status-top"><div><p class="section-kicker">GAME STATUS</p><h2 id="host-status-title">STATUS: AWAITING THE SIGNAL</h2></div><span id="host-status-badge" class="host-status-badge">STANDBY</span></div>
+      <p id="host-status-description">Participants can review Mission, Knowledge, Rules, Security and the Campus Map while waiting.</p>
+      <div class="host-actions">
+        <button id="host-start-button" class="btn btn-primary btn-wide" type="button">START CHALLENGE <span aria-hidden="true">→</span></button>
+        <button id="host-reset-button" class="btn btn-secondary btn-wide" type="button">RESET LOCAL DEMO</button>
+      </div>
+      <p id="host-action-message" class="host-action-message" role="status" aria-live="polite">No real teams are connected in this prototype.</p>
+    </section>
+
+    <section class="host-summary-grid" aria-label="Prototype configuration">
+      <article class="host-summary-card"><span class="host-summary-icon">◈</span><strong>10</strong><span>Team colours configured</span><small>Mock roster · not attendance</small></article>
+      <article class="host-summary-card"><span class="host-summary-icon">⌘</span><strong>4</strong><span>Challenge levels</span><small>Morse · Binary · FSK · Final</small></article>
+    </section>
+
+    <section class="host-flow-panel">
+      <div class="host-panel-heading"><div><p class="section-kicker">EVENT FLOW</p><h2>CHALLENGE SEQUENCE</h2></div><span class="section-id">4 LEVELS</span></div>
+      <ol class="host-level-list">
+        <li><span>01</span><div><strong>Morse Code</strong><small>Decode the rhythm.</small></div><b>→</b></li>
+        <li><span>02</span><div><strong>Binary ASCII</strong><small>Read the digital trail.</small></div><b>→</b></li>
+        <li><span>03</span><div><strong>FSK Signals</strong><small>Follow the frequency shift.</small></div><b>→</b></li>
+        <li><span>04</span><div><strong>Final Challenge</strong><small>Combine what the team learned.</small></div><b>✓</b></li>
+      </ol>
+    </section>
+
+    <footer class="host-footer">
+      <p><strong>For backend integration:</strong> a protected host endpoint must save the official game status. Participant devices must read that status from the backend. This local control is only for UI testing.</p>
+      <a href="README.md">Read frontend setup notes</a>
+    </footer>
+  </main>
+  <script src="js/data.js"></script>
+  <script src="js/host.js"></script>
+</body>
+</html>

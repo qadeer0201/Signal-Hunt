@@ -1,0 +1,58 @@
+/* Signal Hunt design tokens and layout primitives */
+:root {
+  --bg: #0a0b09;
+  --panel: #141612;
+  --panel-raised: #1b1e15;
+  --cream: #f2e5c5;
+  --cream-deep: #e5d5ad;
+  --ink: #1c1b13;
+  --text: #e6dec8;
+  --muted: #aaa48e;
+  --lime: #d8ff36;
+  --border: #424832;
+  --danger: #df4747;
+  --success: #70e77a;
+  --header-height: 64px;
+  --nav-height: 66px;
+  --radius: 12px;
+  --mono: "Consolas", "SFMono-Regular", monospace;
+  --display: Impact, "Arial Narrow", sans-serif;
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--bg); scroll-behavior: smooth; }
+body {
+  margin: 0; min-height: 100vh; min-height: 100dvh; color: var(--text);
+  background-color: var(--bg); font-family: Arial, Helvetica, sans-serif; font-size: 16px;
+  line-height: 1.45; position: relative; isolation: isolate;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background-image: linear-gradient(rgba(5,7,4,.60), rgba(5,7,4,.79)), url("../assets/signal-hunt-background.webp");
+  background-size: cover; background-position: center center; background-repeat: no-repeat;
+}
+body::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .13; background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(216,255,54,.05) 4px); }
+button, input { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+img { display: block; max-width: 100%; }
+.is-hidden, [hidden] { display: none !important; }
+.app-shell { min-height: 100dvh; display: flex; flex-direction: column; }
+.app-main { width: min(100%, 900px); flex: 1 0 auto; margin: 0 auto; padding: 15px 13px calc(var(--nav-height) + 26px + env(safe-area-inset-bottom)); }
+.view { display: none; flex-direction: column; min-width: 0; min-height: calc(100dvh - var(--header-height) - var(--nav-height) - 42px); gap: 12px; }
+.view.is-active { display: flex; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 2px 9px; border-bottom: 1px solid rgba(216,255,54,.25); }
+.section-heading h2 { margin: 0; color: var(--text); font-family: var(--display); font-size: clamp(1.25rem, 4vw, 1.6rem); letter-spacing: .08em; line-height: 1.1; }
+.section-kicker { margin: 0 0 5px; color: #777f54; font: 700 .65rem/1.35 var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+.section-id { color: #a2a080; font: 700 .66rem var(--mono); letter-spacing: .14em; white-space: nowrap; }
+.paper-card { color: var(--ink); background: var(--cream); border: 1px solid #cabc96; border-radius: var(--radius); box-shadow: 0 8px 20px rgba(0,0,0,.23); }
+.eyebrow { color: var(--lime); font: 700 .68rem var(--mono); letter-spacing: .24em; }
+.prototype-label { display: block; color: #a1a584; font: 700 .62rem var(--mono); letter-spacing: .15em; text-transform: uppercase; }
+.fine-print { margin: 10px 0 0; color: #69634f; font-size: .64rem; text-align: center; }
+@media (min-width: 760px) {
+  :root { --header-height: 72px; }
+  .app-main { padding: 24px 24px 46px; }
+  .view { min-height: calc(100dvh - var(--header-height) - 65px); gap: 16px; }
+  body::before { background-position: center 42%; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }

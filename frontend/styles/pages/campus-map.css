@@ -1,0 +1,12 @@
+/* Campus map */
+.map-card { display: flex; flex-direction: column; gap: 11px; padding: 10px; }
+.map-caption { margin: 0; color: #5f583f; font: 800 .68rem var(--mono); letter-spacing: .1em; }
+.map-image-frame { display: flex; align-items: center; justify-content: center; min-height: 180px; padding: 5px; border: 1px solid #c7b890; border-radius: 8px; background: #11140e; overflow: auto; }
+.map-image-frame img { width: 100%; height: auto; object-fit: contain; }
+.map-note { margin: 0; color: #514a36; font-size: .77rem; line-height: 1.45; }
+@media (min-width: 760px) { .map-card { padding: 16px; } .map-image-frame img { max-height: 70vh; } }
+
+#view-campus-map .map-card { flex: 1 0 auto; }
+#view-campus-map .map-image-frame { flex: 1 0 280px; }
+#view-campus-map .map-image-frame img { height: 100%; object-fit: contain; }
+@media (max-width: 759px) { #view-campus-map .map-image-frame { min-height: 340px; } }

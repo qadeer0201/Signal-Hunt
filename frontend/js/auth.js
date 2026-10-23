@@ -1,67 +1,81 @@
-/**
- * auth.js — Signal Hunt Login / Authentication Logic
- * =====================================================
- * PROTOTYPE: Uses mock data from data.js.
- * No real backend calls are made.
- * =====================================================
- */
-
-const Auth = (() => {
-  // Session key used to persist login across page refreshes
-  const SESSION_KEY = "sh_session";
-
-  // -------------------------------------------------------------------------
-  // Public: Return the current logged-in session, or null if not logged in
-  // -------------------------------------------------------------------------
-  function getSession() {
-    try {
-      const raw = sessionStorage.getItem(SESSION_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
+window.Auth = {
+  selectedTeamId: "",
+  init() {
+    this.renderTeamChoices();
+    this.renderDemoCodes();
+    const form = document.getElementById("login-form");
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      this.login();
+    });
+  },
+  renderTeamChoices() {
+    const list = document.getElementById("team-colour-options");
+    list.innerHTML = "";
+    window.SignalHuntData.teams.forEach(team => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "team-choice";
+      button.dataset.teamId = team.id;
+      button.setAttribute("aria-pressed", "false");
+      button.innerHTML = `<span class="team-choice-swatch" style="--team-colour:${team.color}"></span><span>${team.name}</span><span class="team-choice-symbol">${team.icon}</span>`;
+      button.addEventListener("click", () => this.selectTeam(team.id));
+      list.appendChild(button);
+    });
+  },
+  selectTeam(teamId) {
+    this.selectedTeamId = teamId;
+    document.getElementById("team-colour").value = teamId;
+    document.querySelectorAll(".team-choice").forEach(button => {
+      const selected = button.dataset.teamId === teamId;
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+    this.clearError();
+  },
+  renderDemoCodes() {
+    const box = document.getElementById("demo-team-codes");
+    box.innerHTML = window.SignalHuntData.teams.map(team => `<div><span>${team.name}</span><code>${window.SignalHuntMock.teamCodes[team.id]}</code></div>`).join("");
+  },
+  showError(message) {
+    const error = document.getElementById("login-error");
+    error.textContent = message;
+    error.hidden = false;
+  },
+  clearError() {
+    const error = document.getElementById("login-error");
+    error.textContent = "";
+    error.hidden = true;
+  },
+  async login() {
+    const teamId = document.getElementById("team-colour").value;
+    const code = document.getElementById("team-code").value;
+    if (!teamId) return this.showError("Select your team colour to establish your signal.");
+    const result = await window.SignalHuntAPI.login(teamId, code);
+    if (!result.ok) return this.showError(result.message);
+    window.SignalHuntState.currentTeam = result.team;
+    window.SignalHuntState.currentLevel = 1;
+    window.SignalHuntState.completedLevel = 0;
+    window.SignalHuntState.completedStation = null;
+    window.SignalHuntState.demoGameStarted = false;
+    this.clearError();
+    document.getElementById("login-screen").classList.add("is-hidden");
+    document.getElementById("app-shell").classList.remove("is-hidden");
+    document.getElementById("team-code").value = "";
+    if (window.TeamProfile) window.TeamProfile.render();
+    window.Navigation.show("home");
+    if (window.GameFlow) window.GameFlow.syncMockHostStatus(true);
+  },
+  logout() {
+    window.SignalHuntState.currentTeam = null;
+    window.SignalHuntState.currentLevel = 1;
+    window.SignalHuntState.completedLevel = 0;
+    window.SignalHuntState.completedStation = null;
+    window.SignalHuntState.demoGameStarted = false;
+    document.getElementById("app-shell").classList.add("is-hidden");
+    document.getElementById("login-screen").classList.remove("is-hidden");
+    document.getElementById("team-code").value = "";
+    this.selectTeam("");
+    window.Navigation.show("home");
   }
-
-  // -------------------------------------------------------------------------
-  // Public: Attempt login with selected colour + code
-  // Returns { success: true, session } or { success: false, error: string }
-  // -------------------------------------------------------------------------
-  function login(colourId, teamCode) {
-    const trimmedCode = teamCode.trim().toUpperCase();
-
-    // Validate colour selection
-    const colour = TEAM_COLOURS.find((c) => c.id === colourId);
-    if (!colour) {
-      return { success: false, error: "Please select a team colour." };
-    }
-
-    // MOCK: Validate team code against hardcoded data
-    const validCodes = MOCK_TEAM_CODES[colourId] || [];
-    const normalised  = validCodes.map((c) => c.toUpperCase());
-    if (!normalised.includes(trimmedCode)) {
-      return { success: false, error: "Invalid team code. Check your assignment sheet." };
-    }
-
-    // Build session object
-    const session = {
-      colourId:   colour.id,
-      colourLabel: colour.label,
-      colourHex:  colour.hex,
-      colourTextDark: colour.textDark,
-      teamCode:   trimmedCode,
-      loginTime:  Date.now(),
-    };
-
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    return { success: true, session };
-  }
-
-  // -------------------------------------------------------------------------
-  // Public: Destroy the session (logout)
-  // -------------------------------------------------------------------------
-  function logout() {
-    sessionStorage.removeItem(SESSION_KEY);
-  }
-
-  return { getSession, login, logout };
-})();
+};

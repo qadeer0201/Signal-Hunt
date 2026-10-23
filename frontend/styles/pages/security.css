@@ -1,0 +1,12 @@
+/* Security policy */
+.security-card { display: flex; flex-direction: column; align-items: flex-start; padding: 20px; }
+.security-symbol { display: grid; place-items: center; width: 64px; height: 72px; margin-bottom: 13px; color: #fff; background: #333c20; clip-path: polygon(50% 0, 92% 18%, 84% 68%, 50% 100%, 16% 68%, 8% 18%); font-size: 2rem; }
+.security-card .section-kicker { color: #666d40; }
+.security-card h3 { margin: 0 0 10px; color: #1a1a11; font: 900 1.25rem var(--display); letter-spacing: .04em; }
+.security-card > p:not(.section-kicker) { margin: 0; color: #393426; font-size: .92rem; line-height: 1.55; }
+.security-divider { width: 100%; height: 1px; margin: 15px 0; background: #d0c19c; }
+.security-card .security-footnote { color: #625b46 !important; font-size: .75rem !important; }
+.demo-only-card { padding: 14px; border: 1px dashed #656e45; border-radius: 9px; background: rgba(12,15,8,.92); }
+.demo-only-card p { margin: 7px 0 12px; color: #bfb99f; font-size: .76rem; }
+
+#view-security .security-card { flex: 1 0 auto; justify-content: center; }
