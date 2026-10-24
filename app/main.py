@@ -195,8 +195,13 @@ def require_admin(password: str | None, request_ip: str = "global"):
 def get_team_by_code(c, code: str):
     if not code or len(code) > 100:
         return None
-    code_h = hashlib.sha256(code.strip().encode()).hexdigest()
-    return c.execute('SELECT * FROM teams WHERE code_hash=?', (code_h,)).fetchone()
+    clean = code.strip()
+    for variant in [clean, clean.upper(), clean.lower()]:
+        h = hashlib.sha256(variant.encode()).hexdigest()
+        team = c.execute('SELECT * FROM teams WHERE code_hash=?', (h,)).fetchone()
+        if team:
+            return team
+    return None
 
 
 # ---------------------------------------------------------------------------
