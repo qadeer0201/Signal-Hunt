@@ -8,7 +8,13 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 BASE = Path(__file__).parent
-FRONTEND = Path.home() / "Downloads" / "Signal-Hunt" / "frontend"
+candidates = [
+    Path(os.getenv("FRONTEND_DIR", "")),
+    BASE.parent.parent / "frontend",
+    BASE.parent / "frontend",
+    Path.home() / "Downloads" / "Signal-Hunt" / "frontend"
+]
+FRONTEND = next((p for p in candidates if p and p.exists()), Path.home() / "Downloads" / "Signal-Hunt" / "frontend")
 GAME_DURATION_SECONDS = 2 * 60 * 60  # 120 minutes
 
 def get_db_path() -> Path:
