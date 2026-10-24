@@ -1,16 +1,26 @@
+/* Signal Hunt: Live Authentication & Session Manager v2.0 */
 window.Auth = {
   selectedTeamId: "",
+
   init() {
     this.renderTeamChoices();
     this.renderDemoCodes();
+
     const form = document.getElementById("login-form");
-    form.addEventListener("submit", event => {
-      event.preventDefault();
-      this.login();
-    });
+    if (form) {
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        this.login();
+      });
+    }
+
+    // Try restoring existing session on page reload
+    this.restoreSession();
   },
+
   renderTeamChoices() {
     const list = document.getElementById("team-colour-options");
+    if (!list) return;
     list.innerHTML = "";
     window.SignalHuntData.teams.forEach(team => {
       const button = document.createElement("button");
@@ -23,9 +33,11 @@ window.Auth = {
       list.appendChild(button);
     });
   },
+
   selectTeam(teamId) {
     this.selectedTeamId = teamId;
-    document.getElementById("team-colour").value = teamId;
+    const input = document.getElementById("team-colour");
+    if (input) input.value = teamId;
     document.querySelectorAll(".team-choice").forEach(button => {
       const selected = button.dataset.teamId === teamId;
       button.classList.toggle("is-selected", selected);
@@ -33,48 +45,99 @@ window.Auth = {
     });
     this.clearError();
   },
+
   renderDemoCodes() {
     const box = document.getElementById("demo-team-codes");
-    box.innerHTML = window.SignalHuntData.teams.map(team => `<div><span>${team.name}</span><code>${window.SignalHuntMock.teamCodes[team.id]}</code></div>`).join("");
+    if (box) {
+      box.textContent = "Enter the secure, unique access code issued to your team by the organizer.";
+    }
   },
+
   showError(message) {
     const error = document.getElementById("login-error");
+    if (!error) return;
     error.textContent = message;
     error.hidden = false;
   },
+
   clearError() {
     const error = document.getElementById("login-error");
+    if (!error) return;
     error.textContent = "";
     error.hidden = true;
   },
+
   async login() {
-    const teamId = document.getElementById("team-colour").value;
-    const code = document.getElementById("team-code").value;
+    const teamColourInput = document.getElementById("team-colour");
+    const teamCodeInput = document.getElementById("team-code");
+    const teamId = teamColourInput ? teamColourInput.value : "";
+    const code = teamCodeInput ? teamCodeInput.value.trim() : "";
+
     if (!teamId) return this.showError("Select your team colour to establish your signal.");
+    if (!code) return this.showError("Enter your team access code.");
+
     const result = await window.SignalHuntAPI.login(teamId, code);
     if (!result.ok) return this.showError(result.message);
-    window.SignalHuntState.currentTeam = result.team;
-    window.SignalHuntState.currentLevel = 1;
-    window.SignalHuntState.completedLevel = 0;
-    window.SignalHuntState.completedStation = null;
-    window.SignalHuntState.demoGameStarted = false;
+
     this.clearError();
     document.getElementById("login-screen").classList.add("is-hidden");
     document.getElementById("app-shell").classList.remove("is-hidden");
-    document.getElementById("team-code").value = "";
+    if (teamCodeInput) teamCodeInput.value = "";
+
     if (window.TeamProfile) window.TeamProfile.render();
     window.Navigation.show("home");
-    if (window.GameFlow) window.GameFlow.syncMockHostStatus(true);
+    if (window.GameFlow && typeof window.GameFlow.refreshStatus === "function") {
+      window.GameFlow.refreshStatus();
+    }
   },
+
+  restoreSession() {
+    try {
+      const raw = sessionStorage.getItem("sh_session");
+      if (!raw) return false;
+      const session = JSON.parse(raw);
+      if (!session || !session.team || !session.code) return false;
+
+      const state = window.SignalHuntState;
+      state.currentTeam = session.team;
+      state.teamCode = session.code;
+      state.gameStatus = session.status || "waiting";
+      state.remainingSeconds = session.remaining_seconds || 7200;
+      state.currentClue = session.current_clue;
+
+      document.getElementById("login-screen").classList.add("is-hidden");
+      document.getElementById("app-shell").classList.remove("is-hidden");
+
+      if (window.TeamProfile) window.TeamProfile.render();
+      window.Navigation.show("home");
+      if (window.GameFlow && typeof window.GameFlow.refreshStatus === "function") {
+        window.GameFlow.refreshStatus();
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  },
+
   logout() {
-    window.SignalHuntState.currentTeam = null;
-    window.SignalHuntState.currentLevel = 1;
-    window.SignalHuntState.completedLevel = 0;
-    window.SignalHuntState.completedStation = null;
-    window.SignalHuntState.demoGameStarted = false;
+    try {
+      sessionStorage.removeItem("sh_session");
+    } catch (_) {}
+
+    const state = window.SignalHuntState;
+    state.currentTeam = null;
+    state.teamCode = null;
+    state.currentLevel = 1;
+    state.currentRiddle = 1;
+    state.completedLevel = 0;
+    state.solvedCount = 0;
+    state.currentClue = null;
+    state.completed = false;
+
     document.getElementById("app-shell").classList.add("is-hidden");
     document.getElementById("login-screen").classList.remove("is-hidden");
-    document.getElementById("team-code").value = "";
+    const codeInput = document.getElementById("team-code");
+    if (codeInput) codeInput.value = "";
     this.selectTeam("");
     window.Navigation.show("home");
   }

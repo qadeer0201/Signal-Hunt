@@ -1,138 +1,299 @@
+/* Signal Hunt: Live Participant Gameplay Engine v2.0 */
 window.GameFlow = {
+  pollingInterval: null,
+
   init() {
-    document.getElementById("preview-host-start").addEventListener("click", () => {
-      this.setMockHostStatus("active", true);
-    });
-    // The host preview syncs between tabs on the SAME browser/origin only.
-    // Real syncing across phones must come from the backend API.
-    window.addEventListener("storage", event => {
-      if (event.key === "signalHuntDemoStatus") this.syncMockHostStatus(true);
-    });
-    this.syncMockHostStatus(false);
-    document.getElementById("initiate-transmission").addEventListener("click", () => window.Navigation.show("station-code"));
-    document.getElementById("station-code-form").addEventListener("submit", event => {
-      event.preventDefault();
-      this.submitCode();
-    });
-    document.getElementById("retry-station-code").addEventListener("click", () => {
-      document.getElementById("station-code-input").value = "";
-      window.Navigation.show("station-code");
-      document.getElementById("station-code-input").focus();
-    });
-    document.getElementById("continue-game").addEventListener("click", () => {
-      if (window.SignalHuntState.currentLevel >= 4) {
-        window.Navigation.show("complete");
-      } else {
-        window.SignalHuntState.currentLevel += 1;
-        window.Navigation.show("active-game");
-      }
-    });
-    document.getElementById("finish-demo").addEventListener("click", () => window.Navigation.show("home"));
-    document.getElementById("preview-elimination").addEventListener("click", () => {
-      window.SignalHuntState.eliminationReason = "Preview only: leaving the website or navigating back violates the zero-warning policy.";
-      document.getElementById("elimination-reason-text").textContent = window.SignalHuntState.eliminationReason;
-      window.Navigation.show("eliminated");
-    });
-    document.getElementById("elimination-home").addEventListener("click", () => window.Navigation.show("home"));
-    this.renderDemoCodes();
-  },
-  readMockHostStatus() {
-    try { return localStorage.getItem("signalHuntDemoStatus") || "waiting"; }
-    catch (_) { return "waiting"; }
-  },
-  writeMockHostStatus(status) {
-    try { localStorage.setItem("signalHuntDemoStatus", status); }
-    catch (_) { /* file:// browsers may block or isolate storage */ }
-  },
-  setMockHostStatus(status, navigate = false) {
-    this.writeMockHostStatus(status);
-    this.applyMockHostStatus(status, navigate);
-  },
-  syncMockHostStatus(navigate = false) {
-    this.applyMockHostStatus(this.readMockHostStatus(), navigate);
-  },
-  applyMockHostStatus(status, navigate = false) {
-    const active = status === "active";
-    const state = window.SignalHuntState;
-    state.demoGameStarted = active;
-    if (!active) {
-      state.currentLevel = 1;
-      state.completedLevel = 0;
-      state.completedStation = null;
+    // Start challenge button on home screen
+    const previewBtn = document.getElementById("preview-host-start");
+    if (previewBtn) {
+      previewBtn.addEventListener("click", () => {
+        const state = window.SignalHuntState;
+        if (state.gameStatus === "active") {
+          window.Navigation.show("active-game");
+        } else {
+          window.Navigation.showToast("The host has not started the hunt yet. Await the transmission signal.");
+        }
+      });
     }
+
+    // Initiate transmission from active game
+    const initBtn = document.getElementById("initiate-transmission");
+    if (initBtn) {
+      initBtn.addEventListener("click", () => window.Navigation.show("station-code"));
+    }
+
+    // Station code submission
+    const form = document.getElementById("station-code-form");
+    if (form) {
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        this.submitCode();
+      });
+    }
+
+    // Retry code
+    const retryBtn = document.getElementById("retry-station-code");
+    if (retryBtn) {
+      retryBtn.addEventListener("click", () => {
+        const input = document.getElementById("station-code-input");
+        if (input) input.value = "";
+        window.Navigation.show("station-code");
+        if (input) input.focus();
+      });
+    }
+
+    // Continue after correct solve
+    const continueBtn = document.getElementById("continue-game");
+    if (continueBtn) {
+      continueBtn.addEventListener("click", () => {
+        const state = window.SignalHuntState;
+        if (state.completed || state.solvedCount >= 16) {
+          window.Navigation.show("complete");
+        } else {
+          window.Navigation.show("active-game");
+        }
+      });
+    }
+
+    const finishBtn = document.getElementById("finish-demo");
+    if (finishBtn) {
+      finishBtn.addEventListener("click", () => window.Navigation.show("home"));
+    }
+
+    const elimHome = document.getElementById("elimination-home");
+    if (elimHome) {
+      elimHome.addEventListener("click", () => window.Navigation.show("home"));
+    }
+
+    // Start periodic live polling
+    this.startPolling();
+  },
+
+  startPolling() {
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
+    this.refreshStatus();
+    this.pollingInterval = setInterval(() => this.refreshStatus(), 2500);
+  },
+
+  formatTime(seconds) {
+    seconds = Math.max(0, Number(seconds) || 0);
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h, m, s].map(n => String(n).padStart(2, "0")).join(":");
+  },
+
+  async refreshStatus() {
+    const state = window.SignalHuntState;
+    if (!state.currentTeam || !state.teamCode) {
+      // Not logged in: poll public game status
+      try {
+        const publicStatus = await window.SignalHuntAPI.getStatus();
+        state.gameStatus = publicStatus.status || "waiting";
+        state.remainingSeconds = publicStatus.remaining_seconds;
+        this.updateHomeUI();
+      } catch (_) {}
+      return;
+    }
+
+    // Logged in: poll team current progress and status
+    try {
+      const data = await window.SignalHuntAPI.getTeamCurrent(state.teamCode);
+      state.gameStatus = data.status || "waiting";
+      state.remainingSeconds = data.remaining_seconds;
+      state.currentClue = data.current_clue;
+
+      if (data.progress) {
+        state.solvedCount = data.progress.solved_count;
+        state.currentLevel = data.progress.current_station;
+        state.currentRiddle = data.progress.current_riddle;
+        state.completed = data.progress.completed;
+      }
+
+      this.updateHomeUI();
+
+      // If viewing active game, refresh current challenge display
+      if (state.currentPage === "active-game") {
+        this.renderActiveGame();
+      }
+    } catch (err) {
+      if (err.message && err.message.includes("eliminated")) {
+        state.eliminated = true;
+        window.Navigation.show("eliminated");
+      }
+    }
+  },
+
+  updateHomeUI() {
+    const state = window.SignalHuntState;
     const title = document.getElementById("home-status-title");
     const body = document.getElementById("home-status-text");
-    const previewButton = document.getElementById("preview-host-start");
-    if (title) title.textContent = active ? "STATUS: SIGNAL ACTIVE · DEMO" : window.SignalHuntData.copy.waitingTitle;
-    if (body) body.textContent = active
-      ? "The host has started the hunt. This is still a local demo until the backend is connected."
-      : window.SignalHuntData.copy.waitingBody;
-    if (previewButton) previewButton.innerHTML = active
-      ? 'OPEN CURRENT CHALLENGE <span aria-hidden="true">→</span>'
-      : 'Preview active game (local demo) <span aria-hidden="true">→</span>';
-    if (window.TeamProfile && state.currentTeam) window.TeamProfile.render();
-    const shell = document.getElementById("app-shell");
-    if (active && navigate && shell && !shell.classList.contains("is-hidden") && state.currentTeam) {
-      window.Navigation.show("active-game");
-    } else if (!active && navigate && shell && !shell.classList.contains("is-hidden") &&
-               ["active-game", "station-code", "code-success"].includes(state.currentPage)) {
-      window.Navigation.show("home");
+    const button = document.getElementById("preview-host-start");
+
+    if (!title || !body) return;
+
+    const timeStr = this.formatTime(state.remainingSeconds);
+
+    if (state.gameStatus === "active") {
+      title.textContent = `STATUS: SIGNAL ACTIVE · ${timeStr}`;
+      body.textContent = "The hunt is live; every signal leads closer to the truth.";
+      if (button) {
+        button.innerHTML = 'OPEN CURRENT CHALLENGE <span aria-hidden="true">→</span>';
+        button.className = "btn btn-primary btn-compact";
+      }
+    } else if (state.gameStatus === "paused") {
+      title.textContent = `STATUS: GAME PAUSED · ${timeStr}`;
+      body.textContent = "The organizer has paused the game. Submissions are temporarily locked.";
+      if (button) {
+        button.innerHTML = 'HUNT PAUSED BY ORGANIZER';
+        button.className = "btn btn-secondary btn-compact";
+      }
+    } else if (state.gameStatus === "finished") {
+      title.textContent = "STATUS: GAME CONCLUDED";
+      body.textContent = "The event countdown has concluded. Report to Rooms 07 & 08.";
+      if (button) {
+        button.innerHTML = 'EVENT CONCLUDED';
+        button.className = "btn btn-secondary btn-compact";
+      }
+    } else {
+      // Waiting
+      title.textContent = window.SignalHuntData.copy.waitingTitle;
+      body.textContent = window.SignalHuntData.copy.waitingBody;
+      if (button) {
+        button.innerHTML = 'AWAITING ORGANIZER TRANSMISSION';
+        button.className = "btn btn-secondary btn-compact";
+      }
+    }
+
+    if (window.TeamProfile && state.currentTeam) {
+      window.TeamProfile.render();
     }
   },
+
   getCurrentStation() {
-    return window.SignalHuntData.stations.find(item => item.level === window.SignalHuntState.currentLevel) || window.SignalHuntData.stations[0];
+    const level = window.SignalHuntState.currentLevel || 1;
+    return window.SignalHuntData.stations.find(item => item.level === level) || window.SignalHuntData.stations[0];
   },
+
   renderActiveGame() {
     const state = window.SignalHuntState;
     const station = this.getCurrentStation();
-    document.getElementById("game-level-label").textContent = `LEVEL ${station.level} OF 4`;
-    document.getElementById("game-progress-count").textContent = `${state.completedLevel} / 4 COMPLETE`;
-    document.getElementById("game-station-title").textContent = `${String(station.level).padStart(2, "0")} · ${station.short}`;
-    document.getElementById("game-station-description").textContent = window.SignalHuntData.copy.activeBody;
-    document.getElementById("game-instruction").textContent = station.instruction;
-    document.getElementById("game-topic-icon").innerHTML = `<img src="${station.icon}" alt="">`;
+
+    const levelLabel = document.getElementById("game-level-label");
+    const progressCount = document.getElementById("game-progress-count");
+    const stationTitle = document.getElementById("game-station-title");
+    const stationDesc = document.getElementById("game-station-description");
+    const instruction = document.getElementById("game-instruction");
+    const topicIcon = document.getElementById("game-topic-icon");
+
+    if (levelLabel) levelLabel.textContent = `STATION ${station.level} OF 4`;
+    if (progressCount) progressCount.textContent = `${state.solvedCount} / ${state.totalClues} COMPLETE`;
+    if (stationTitle) stationTitle.textContent = `${String(station.level).padStart(2, "0")} · ${station.short}`;
+
+    if (state.currentClue) {
+      if (stationDesc) stationDesc.textContent = `Riddle #${state.currentRiddle}: ${state.currentClue.title}`;
+      if (instruction) instruction.textContent = state.currentClue.prompt;
+    } else if (state.completed) {
+      if (stationDesc) stationDesc.textContent = "All riddles solved!";
+      if (instruction) instruction.textContent = "Return to Rooms 07 & 08 to claim victory.";
+    } else {
+      if (stationDesc) stationDesc.textContent = window.SignalHuntData.copy.activeBody;
+      if (instruction) instruction.textContent = station.instruction;
+    }
+
+    if (topicIcon) {
+      topicIcon.innerHTML = `<img src="${station.icon}" alt="">`;
+    }
+
+    // Step track indicators
     const steps = document.querySelectorAll("#level-track .level-step");
     const connectors = document.querySelectorAll("#level-track .level-connector");
+
     steps.forEach((step, index) => {
       step.classList.toggle("is-current", index + 1 === station.level);
-      step.classList.toggle("is-complete", index + 1 <= state.completedLevel);
+      step.classList.toggle("is-complete", index + 1 < station.level || state.completed);
     });
-    connectors.forEach((line, index) => line.classList.toggle("is-complete", index + 1 <= state.completedLevel));
+
+    connectors.forEach((line, index) => {
+      line.classList.toggle("is-complete", index + 1 < station.level || state.completed);
+    });
   },
-  renderDemoCodes() {
-    const box = document.getElementById("demo-station-codes");
-    box.innerHTML = window.SignalHuntData.stations.map(item => `<div><span>Level ${item.level} · ${item.name}</span><code>${window.SignalHuntMock.stationCodes[item.level]}</code></div>`).join("");
-  },
+
   prepareCodeEntry() {
+    const state = window.SignalHuntState;
     const station = this.getCurrentStation();
-    document.getElementById("code-level-label").textContent = `LVL ${String(station.level).padStart(2, "0")}`;
-    document.getElementById("station-code-input").placeholder = window.SignalHuntData.copy.stationPlaceholder;
-    document.getElementById("station-code-message").hidden = true;
-    document.getElementById("station-code-message").textContent = "";
-    document.getElementById("station-code-input").value = "";
-  },
-  async submitCode() {
+
+    const levelLabel = document.getElementById("code-level-label");
     const input = document.getElementById("station-code-input");
     const message = document.getElementById("station-code-message");
-    const code = input.value.trim();
-    if (!code) {
-      message.textContent = window.SignalHuntData.copy.emptyCode;
-      message.className = "form-message error-message";
-      message.hidden = false;
+
+    if (levelLabel) {
+      levelLabel.textContent = `STN ${String(station.level).padStart(2, "0")} · R#${state.currentRiddle}`;
+    }
+    if (input) {
+      input.placeholder = window.SignalHuntData.copy.stationPlaceholder;
+      input.value = "";
       input.focus();
+    }
+    if (message) {
+      message.hidden = true;
+      message.textContent = "";
+    }
+  },
+
+  async submitCode() {
+    const state = window.SignalHuntState;
+    const input = document.getElementById("station-code-input");
+    const message = document.getElementById("station-code-message");
+    const answer = input ? input.value.trim() : "";
+
+    if (!answer) {
+      if (message) {
+        message.textContent = window.SignalHuntData.copy.emptyCode;
+        message.className = "form-message error-message";
+        message.hidden = false;
+      }
+      if (input) input.focus();
       return;
     }
-    const result = await window.SignalHuntAPI.verifyStation(window.SignalHuntState.currentLevel, code);
+
+    const currentClueId = state.currentClue ? state.currentClue.id : null;
+    const currentStation = state.currentLevel;
+
+    // Send to real backend
+    const result = await window.SignalHuntAPI.submitAnswer(answer, currentClueId, currentStation);
+
     if (!result.ok) {
-      window.Navigation.show("code-invalid");
+      if (message) {
+        message.textContent = result.message;
+        message.className = "form-message error-message";
+        message.hidden = false;
+      }
+      if (result.message && result.message.toLowerCase().includes("rejected")) {
+        window.Navigation.show("code-invalid");
+      }
       return;
     }
-    window.SignalHuntState.completedLevel = Math.max(window.SignalHuntState.completedLevel, result.level);
-    window.SignalHuntState.completedStation = result.station;
-    document.getElementById("success-level-label").textContent = `LEVEL ${result.level} COMPLETE`;
-    document.getElementById("success-station-name").textContent = result.station.name.toUpperCase();
-    document.getElementById("success-progress").textContent = `${String(result.level).padStart(2, "0")} / 04 COMPLETE`;
-    document.getElementById("continue-game").textContent = result.level === 4 ? "VIEW FINAL TRANSMISSION →" : "CONTINUE →";
-    window.Navigation.show("code-success");
+
+    if (result.correct) {
+      const solved = result.progress ? result.progress.solved_count : state.solvedCount;
+      const completed = result.progress ? result.progress.completed : state.completed;
+
+      const successLevel = document.getElementById("success-level-label");
+      const successStation = document.getElementById("success-station-name");
+      const successProgress = document.getElementById("success-progress");
+      const continueBtn = document.getElementById("continue-game");
+
+      if (successLevel) successLevel.textContent = `STATION ${state.currentLevel} · RIDDLE #${state.currentRiddle} SOLVED`;
+      if (successStation) successStation.textContent = "SIGNAL DECODED";
+      if (successProgress) successProgress.textContent = `${String(solved).padStart(2, "0")} / 16 COMPLETE`;
+      if (continueBtn) {
+        continueBtn.textContent = completed ? "VIEW FINAL TRANSMISSION →" : "NEXT RIDDLE →";
+      }
+
+      window.Navigation.show("code-success");
+    } else {
+      window.Navigation.show("code-invalid");
+    }
   }
 };

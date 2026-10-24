@@ -4,55 +4,218 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0a0b09">
-  <title>Signal Hunt — Host Dashboard (Prototype)</title>
+  <title>Signal Hunt — Host Dashboard</title>
   <link rel="stylesheet" href="styles/base.css">
   <link rel="stylesheet" href="styles/components.css">
   <link rel="stylesheet" href="styles/pages/host.css">
+  <style>
+    .host-section-title { font: 900 1.25rem var(--display); color: var(--text); letter-spacing: 0.05em; margin: 24px 0 12px; }
+    .host-teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 10px; }
+    .host-team-card { padding: 14px; border: 1px solid #424832; border-radius: 8px; background: rgba(16, 20, 12, 0.95); display: flex; flex-direction: column; gap: 8px; }
+    .host-team-header { display: flex; align-items: center; justify-content: space-between; }
+    .host-team-name-row { display: flex; align-items: center; gap: 8px; }
+    .team-swatch { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 1px solid rgba(255,255,255,0.4); }
+    .host-team-title { font: 800 0.95rem var(--display); color: var(--text); }
+    .team-badge { font: 800 0.65rem var(--mono); padding: 3px 7px; border-radius: 4px; text-transform: uppercase; }
+    .badge-playing { background: #26794b; color: #fff; }
+    .badge-completed { background: #d8ff36; color: #171717; }
+    .badge-eliminated { background: #c93636; color: #fff; }
+    .host-team-stats { font: 700 0.75rem var(--mono); color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+    .host-team-stats b { color: var(--text); }
+    .progress-bar-bg { width: 100%; height: 6px; background: #2a2f1e; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+    .progress-bar-fill { height: 100%; background: var(--lime); width: 0%; transition: width 0.4s ease; }
+    .host-riddles-container { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+    .station-accordion { border: 1px solid #3c4528; border-radius: 8px; overflow: hidden; background: rgba(10, 12, 8, 0.94); }
+    .station-accordion-header { padding: 10px 14px; background: #1c2214; display: flex; align-items: center; justify-content: space-between; font: 800 0.85rem var(--display); color: var(--text); }
+    .station-riddles-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .riddle-item { padding: 8px 10px; border: 1px solid #2f3620; border-radius: 6px; background: rgba(20,24,16,0.8); display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.78rem; }
+    .riddle-item-info { display: flex; flex-direction: column; gap: 2px; }
+    .riddle-item-info strong { color: var(--text); }
+    .riddle-item-info small { color: var(--muted); }
+    .host-log-table { width: 100%; border-collapse: collapse; font: 700 0.72rem var(--mono); color: var(--text); margin-top: 10px; }
+    .host-log-table th { text-align: left; padding: 8px; border-bottom: 1px solid #3c4528; color: var(--lime); }
+    .host-log-table td { padding: 7px 8px; border-bottom: 1px solid #1f2516; }
+    .log-success { color: #d8ff36; }
+    .log-fail { color: #e87832; }
+    .log-alert { color: #ff6b6b; font-weight: bold; }
+    .host-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .host-modal-box { width: min(90%, 480px); background: #181d12; border: 1px solid var(--lime); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .host-modal-box h3 { margin: 0; color: var(--text); font: 900 1.2rem var(--display); }
+    .host-modal-box p { font-size: 0.82rem; color: #c7c0aa; margin: 0; }
+  </style>
 </head>
 <body>
   <main class="host-shell">
     <header class="host-header">
-      <a class="host-brand" href="index.html"><img src="assets/signal-hunt-logo.webp" alt=""><span><strong>SIGNAL HUNT</strong><small>HOST CONTROL · PROTOTYPE</small></span></a>
+      <a class="host-brand" href="index.html">
+        <img src="assets/signal-hunt-logo.webp" alt="Signal Hunt logo">
+        <span><strong>SIGNAL HUNT</strong><small>HOST CONTROL · LIVE SYSTEM</small></span>
+      </a>
       <a class="btn btn-secondary btn-compact" href="index.html">OPEN PARTICIPANT VIEW ↗</a>
     </header>
 
     <section class="host-intro">
-      <p class="section-kicker">ORGANISED TRANSMISSION CONTROL</p>
+      <p class="section-kicker">AUTHENTICATED TRANSMISSION CONTROL</p>
       <h1>HOST DASHBOARD</h1>
-      <p>Use this page to preview how an authorised host will start Signal Hunt.</p>
-      <div class="host-warning"><strong>PROTOTYPE ONLY</strong><span>This demo has no host authentication. It syncs only between tabs using the same browser and local origin. It does not start the game on other phones. Do not deploy it as a real host control panel.</span></div>
+      <p>Server-authoritative control panel for event lifecycle, team tracking, and riddle management.</p>
     </section>
 
+    <!-- GAME STATE & LIFECYCLE CONTROLS -->
     <section class="host-status-panel paper-card" aria-live="polite">
-      <div class="host-status-top"><div><p class="section-kicker">GAME STATUS</p><h2 id="host-status-title">STATUS: AWAITING THE SIGNAL</h2></div><span id="host-status-badge" class="host-status-badge">STANDBY</span></div>
-      <p id="host-status-description">Participants can review Mission, Knowledge, Rules, Security and the Campus Map while waiting.</p>
+      <div class="host-status-top">
+        <div>
+          <p class="section-kicker">EVENT STATUS</p>
+          <h2 id="host-status-title">STATUS: AWAITING THE SIGNAL</h2>
+        </div>
+        <span id="host-status-badge" class="host-status-badge">STANDBY</span>
+      </div>
+      <p id="host-status-description">Participants can review Mission, Knowledge, Rules, and Campus Map while waiting.</p>
+
+      <label for="host-admin-password" class="field-label">ORGANIZER PASSWORD</label>
+      <input id="host-admin-password" type="password" autocomplete="current-password"
+             placeholder="Enter organizer password to authenticate..." />
+
       <div class="host-actions">
         <button id="host-start-button" class="btn btn-primary btn-wide" type="button">START CHALLENGE <span aria-hidden="true">→</span></button>
-        <button id="host-reset-button" class="btn btn-secondary btn-wide" type="button">RESET LOCAL DEMO</button>
+        <button id="host-reset-button" class="btn btn-secondary btn-wide" type="button">PAUSE GAME</button>
+        <button id="host-finish-button" class="btn btn-secondary btn-wide" type="button">FINISH GAME</button>
+        <button id="host-rearm-button" class="btn btn-danger btn-wide" type="button">RESET / RE-ARM</button>
       </div>
-      <p id="host-action-message" class="host-action-message" role="status" aria-live="polite">No real teams are connected in this prototype.</p>
+      <p id="host-action-message" class="host-action-message" role="status" aria-live="polite">Authenticate with organizer password to view live telemetry.</p>
     </section>
 
-    <section class="host-summary-grid" aria-label="Prototype configuration">
-      <article class="host-summary-card"><span class="host-summary-icon">◈</span><strong>10</strong><span>Team colours configured</span><small>Mock roster · not attendance</small></article>
-      <article class="host-summary-card"><span class="host-summary-icon">⌘</span><strong>4</strong><span>Challenge levels</span><small>Morse · Binary · FSK · Final</small></article>
+    <!-- LIVE METRICS SUMMARY -->
+    <section class="host-summary-grid" aria-label="Live event telemetry">
+      <article class="host-summary-card">
+        <span class="host-summary-icon">◈</span>
+        <strong id="summary-active-teams">0 / 4</strong>
+        <span>Registered Teams</span>
+        <small id="summary-devices-count">0 connected participant devices</small>
+      </article>
+      <article class="host-summary-card">
+        <span class="host-summary-icon">⌘</span>
+        <strong id="summary-active-clues">16</strong>
+        <span>Active Station Riddles</span>
+        <small id="summary-solved-count">0 total riddle solves confirmed</small>
+      </article>
     </section>
 
+    <!-- LIVE TEAMS PROGRESS -->
+    <section>
+      <h2 class="host-section-title">TEAMS PROGRESS & ROSTER</h2>
+      <div id="host-teams-grid" class="host-teams-grid">
+        <p style="color:var(--muted); font-size:0.8rem;">Enter organizer password to inspect live team states.</p>
+      </div>
+    </section>
+
+    <!-- RIDDLE MANAGEMENT -->
     <section class="host-flow-panel">
-      <div class="host-panel-heading"><div><p class="section-kicker">EVENT FLOW</p><h2>CHALLENGE SEQUENCE</h2></div><span class="section-id">4 LEVELS</span></div>
-      <ol class="host-level-list">
-        <li><span>01</span><div><strong>Morse Code</strong><small>Decode the rhythm.</small></div><b>→</b></li>
-        <li><span>02</span><div><strong>Binary ASCII</strong><small>Read the digital trail.</small></div><b>→</b></li>
-        <li><span>03</span><div><strong>FSK Signals</strong><small>Follow the frequency shift.</small></div><b>→</b></li>
-        <li><span>04</span><div><strong>Final Challenge</strong><small>Combine what the team learned.</small></div><b>✓</b></li>
-      </ol>
+      <div class="host-panel-heading">
+        <div>
+          <p class="section-kicker">RIDDLE CONTROL</p>
+          <h2>4 STATIONS · 16 RIDDLES</h2>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button id="btn-seed-riddles" class="btn btn-secondary btn-compact" type="button">SEED TEMPLATE RIDDLES</button>
+          <button id="btn-add-riddle" class="btn btn-primary btn-compact" type="button">+ ADD RIDDLE</button>
+        </div>
+      </div>
+      <div id="host-riddles-container" class="host-riddles-container">
+        <!-- Rendered by host.js -->
+      </div>
+    </section>
+
+    <!-- LIVE SUBMISSIONS & AUDIT EVENTS -->
+    <section class="host-flow-panel">
+      <div class="host-panel-heading">
+        <div>
+          <p class="section-kicker">AUDIT LOG</p>
+          <h2>LIVE ACTIVITY & SUBMISSIONS</h2>
+        </div>
+        <span id="log-count-badge" class="section-id">0 EVENTS</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="host-log-table">
+          <thead>
+            <tr>
+              <th>TIME</th>
+              <th>TEAM</th>
+              <th>EVENT / RIDDLE</th>
+              <th>RESULT / DETAILS</th>
+            </tr>
+          </thead>
+          <tbody id="host-log-tbody">
+            <tr><td colspan="4" style="color:var(--muted); text-align:center;">No events recorded yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <footer class="host-footer">
-      <p><strong>For backend integration:</strong> a protected host endpoint must save the official game status. Participant devices must read that status from the backend. This local control is only for UI testing.</p>
-      <a href="README.md">Read frontend setup notes</a>
+      <p><strong>Signal Hunt Backend:</strong> Server-authoritative state engine with constant-time cryptographic verification and SQLite WAL persistence.</p>
     </footer>
   </main>
+
+  <!-- ADD / EDIT RIDDLE MODAL -->
+  <div id="modal-riddle" class="host-modal-overlay" hidden>
+    <div class="host-modal-box">
+      <h3 id="modal-riddle-title">Add Station Riddle</h3>
+      <form id="form-riddle" style="display:flex; flex-direction:column; gap:10px;">
+        <input type="hidden" id="riddle-edit-id" value="">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div>
+            <label class="field-label">Station (1–4)</label>
+            <select id="riddle-station" class="text-input" style="height:38px;">
+              <option value="1">Station 1: Morse Code</option>
+              <option value="2">Station 2: Binary ASCII</option>
+              <option value="3">Station 3: FSK Signals</option>
+              <option value="4">Station 4: Final Challenge</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Riddle Order (1–4)</label>
+            <select id="riddle-order" class="text-input" style="height:38px;">
+              <option value="1">Riddle 1</option>
+              <option value="2">Riddle 2</option>
+              <option value="3">Riddle 3</option>
+              <option value="4">Riddle 4</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="field-label">Title</label>
+          <input type="text" id="riddle-title" class="text-input" placeholder="e.g. Rhythm of the Waves" required>
+        </div>
+        <div>
+          <label class="field-label">Prompt / Puzzle Text</label>
+          <textarea id="riddle-prompt" class="text-input" rows="3" placeholder="Enter clue text or encoded ciphertext..." required></textarea>
+        </div>
+        <div>
+          <label class="field-label">Expected Answer</label>
+          <input type="text" id="riddle-answer" class="text-input" placeholder="Secret answer phrase (stored as SHA-256 hash)" required>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+          <button type="button" id="btn-cancel-riddle" class="btn btn-secondary btn-compact">CANCEL</button>
+          <button type="submit" class="btn btn-primary btn-compact">SAVE RIDDLE</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- RE-ARM CONFIRMATION MODAL -->
+  <div id="modal-rearm" class="host-modal-overlay" hidden>
+    <div class="host-modal-box" style="border-color:#c93636;">
+      <h3 style="color:#ff6b6b;">CONFIRM EVENT RE-ARM</h3>
+      <p>This action will return the game to <strong>WAITING</strong> status and reset the countdown timer to 120 minutes. All previous submissions will be cleared so teams can start fresh.</p>
+      <label class="field-label" style="margin-top:6px;">Type <strong>RESET_SIGNAL_HUNT</strong> to confirm:</label>
+      <input type="text" id="rearm-confirm-input" class="text-input" placeholder="RESET_SIGNAL_HUNT" autocomplete="off">
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+        <button type="button" id="btn-cancel-rearm" class="btn btn-secondary btn-compact">CANCEL</button>
+        <button type="button" id="btn-confirm-rearm" class="btn btn-danger btn-compact">RESET &amp; RE-ARM</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/data.js"></script>
   <script src="js/host.js"></script>
 </body>
