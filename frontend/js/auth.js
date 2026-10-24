@@ -42,7 +42,7 @@ window.Auth = {
     const activeColours = ["red", "black", "navy", "yellow"];
     if (codeInput && teamId) {
       if (activeColours.includes(teamId)) {
-        codeInput.placeholder = `e.g. ${teamId.toUpperCase()}-2026`;
+        codeInput.placeholder = "Enter your team access code…";
       } else {
         codeInput.placeholder = "Team inactive for this event";
       }
