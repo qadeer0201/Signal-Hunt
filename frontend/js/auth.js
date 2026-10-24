@@ -38,6 +38,10 @@ window.Auth = {
     this.selectedTeamId = teamId;
     const input = document.getElementById("team-colour");
     if (input) input.value = teamId;
+    const codeInput = document.getElementById("team-code");
+    if (codeInput && teamId) {
+      codeInput.placeholder = `e.g. ${teamId.toUpperCase()}-2026`;
+    }
     document.querySelectorAll(".team-choice").forEach(button => {
       const selected = button.dataset.teamId === teamId;
       button.classList.toggle("is-selected", selected);
@@ -48,9 +52,25 @@ window.Auth = {
 
   renderDemoCodes() {
     const box = document.getElementById("demo-team-codes");
-    if (box) {
-      box.textContent = "Enter the secure, unique access code issued to your team by the organizer.";
-    }
+    if (!box) return;
+    const codes = [
+      { name: "Red", code: "RED-2026", id: "red" },
+      { name: "Black", code: "BLACK-2026", id: "black" },
+      { name: "Navy Blue", code: "NAVY-2026", id: "navy" },
+      { name: "Yellow", code: "YELLOW-2026", id: "yellow" },
+      { name: "Orange", code: "ORANGE-2026", id: "orange" },
+      { name: "Green", code: "GREEN-2026", id: "green" },
+      { name: "Purple", code: "PURPLE-2026", id: "purple" },
+      { name: "Grey", code: "GREY-2026", id: "grey" },
+      { name: "Brown", code: "BROWN-2026", id: "brown" },
+      { name: "Peach", code: "PEACH-2026", id: "peach" }
+    ];
+    box.innerHTML = codes.map(c => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px dashed #cbbd96; font-size:0.8rem;">
+        <span style="font-weight:700;">${c.name}</span>
+        <code style="background:#242216; color:#d8ff36; padding:3px 8px; border-radius:4px; font-weight:800; cursor:pointer;" onclick="window.Auth.selectTeam('${c.id}'); document.getElementById('team-code').value='${c.code}';">${c.code}</code>
+      </div>
+    `).join("");
   },
 
   showError(message) {
