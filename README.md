@@ -1,36 +1,190 @@
-# Signal Hunt — starter full-stack application
+🔍 Signal Hunt
 
-Python/FastAPI backend, SQLite persistence, responsive HTML/CSS/JS frontend. Includes team registration, one-time team code, clue submissions, server-side answer checking, violation logging/team elimination, organizer dashboard, clue creation, and organizer reinstatement.
+A Team-Based, Multi-Station Riddle Hunt Platform
 
-## Local run on Linux Mint
+A full-stack event platform built to manage team access, riddle solving, answer validation and progression across multiple stations in a timed competition.
 
-```bash
-cd signal-hunt
+---
+
+🎯 Project Overview
+
+Signal Hunt is designed for organized, team-based riddle hunt events. Participants access the mobile-friendly interface, solve challenges and progress through stations while organizers monitor event activity through a host dashboard.
+
+Goal: Deliver a smooth, fair and organized hunt experience for participants and event organizers.
+
+✨ Key Features
+
+- Team Authentication — Dedicated team access.
+- Multi-Station Gameplay — Structured clue and station progression.
+- Server-Authoritative Progression — Backend controls progression decisions.
+- Answer Validation — Server-side verification of submitted answers.
+- Admin Dashboard — Organizer controls and event monitoring.
+- Live Telemetry — Event activity and submission visibility, subject to implemented functionality.
+- Rate Limiting — Helps control excessive requests.
+- Responsive UI — Participant interface designed for mobile devices.
+- Clue Management — Authorized clue creation and management.
+- Event Tracking — Monitor team progress and completion.
+
+🎮 Event Configuration
+
+Setting| Planned Configuration
+Teams| 10
+Members per team| 5
+Total participants| 50
+Stations| 4
+Riddles| 16
+Riddles per station| 4
+Event duration| 2 hours
+
+Event configuration may change.
+
+🏗️ Architecture
+
+Participant Mobile Web App
+          |
+          v
+    FastAPI Backend
+          |
+          v
+ Authentication + Validation
+          |
+          v
+ Progression + Event Logic
+          |
+          v
+       Data Storage
+
+Organizer Dashboard
+          |
+          v
+    FastAPI Backend
+
+The frontend handles the user interface and API communication. The backend is responsible for trusted gameplay decisions, authentication, validation and progression.
+
+🛠️ Tech Stack
+
+Frontend
+
+- HTML5
+- CSS3
+- JavaScript
+
+Backend
+
+- Python
+- FastAPI
+- Uvicorn
+
+Development & Deployment
+
+- Git & GitHub
+- Docker
+- Environment-based configuration
+
+📁 Project Structure
+
+Signal-Hunt/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   └── main.py
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── .env.example
+│   └── README.md
+├── frontend/
+│   ├── assets/
+│   ├── js/
+│   ├── styles/
+│   ├── index.html
+│   ├── host.html
+│   └── README.md
+├── .gitignore
+└── README.md
+
+🚀 Getting Started
+
+Prerequisites
+
+- Python 3
+- pip
+- Git
+
+1. Clone the Repository
+
+git clone YOUR_REPOSITORY_URL
+cd Signal-Hunt
+
+2. Set Up the Backend
+
+cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-export ADMIN_PASSWORD='choose-a-long-password-here'
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
 
-Open http://127.0.0.1:8000. API docs: http://127.0.0.1:8000/docs. Demo clue answer is `hi`; change/remove this before the event.
+3. Configure Environment Variables
 
-## Deploy with Docker
+Review ".env.example" and configure the required environment variables using your deployment or local configuration method.
 
-```bash
-cp .env.example .env
-# Edit .env and set a unique ADMIN_PASSWORD.
-docker build -t signal-hunt .
-mkdir -p data
-docker run --name signal-hunt --restart unless-stopped -p 8000:8000 --env-file .env -v "$PWD/data:/data" signal-hunt
-```
+Never commit production secrets or real credentials.
 
-For public internet access, deploy the container to a host that supports Docker and persistent storage, configure `DATABASE_PATH` to that persistent disk, and enable HTTPS. Do not expose the service publicly until the default admin password is changed. Back up the SQLite database before the event. Do a full rehearsal with multiple phones.
+4. Start the Backend
 
-## Important limitations / before event use
+Use the project's configured startup command. For a compatible FastAPI application:
 
-- The browser Back trap works only in browsers that expose the history event. It is not tamper-proof. A user may close the browser, use another device, or evade browser-side code. The backend persists an elimination once it receives the violation, and refresh cannot undo it.
-- We deliberately do not auto-eliminate on tab switching or `visibilitychange`, because notifications, calls, and accidental backgrounding are common on phones.
-- Team codes are bearer secrets. Anyone who obtains one can access that team. Share securely and do not publish codes.
-- This starter uses a single-process SQLite setup. For larger concurrent events, use PostgreSQL, add rate limits, CSRF/origin protections as appropriate, stronger admin authentication, and test load/backup/restore. Do not treat it as a fully audited production security system.
-- Replace the demo clue, validate the final event rules with organizers, and test Android Chrome, iOS Safari, and desktop browsers. A web app cannot disable mobile data or reliably prevent leaving the browser.
+uvicorn app.main:app --reload
+
+5. Open the Frontend
+
+Serve the frontend using a local static HTTP server or the project's configured frontend hosting.
+
+Configure the API base URL to match the backend endpoint.
+
+The exact startup and frontend configuration steps must match the implementation.
+
+🔐 Security Principles
+
+- Backend-enforced authorization.
+- Server-side answer validation.
+- Rate limiting for sensitive endpoints.
+- Secrets managed outside version control.
+- Input validation and controlled error responses.
+- Restricted organizer operations.
+- Protection against unauthorized progression.
+- Production HTTPS and secure credential handling.
+
+Security measures require testing and verification; listing them here does not establish that the application is secure.
+
+🧪 Testing Checklist
+
+- [ ] Team login and invalid credentials
+- [ ] Unauthorized admin access
+- [ ] Clue creation and editing
+- [ ] Correct and incorrect answer submissions
+- [ ] Station and level unlocking
+- [ ] Event expiry and timer enforcement
+- [ ] Repeated and rapid submissions
+- [ ] Concurrent team submissions
+- [ ] Data persistence after restart
+- [ ] Mobile interface usability
+- [ ] Production deployment smoke test
+
+📍 Project Status
+
+Current status: Development / Testing
+
+The project is being prepared for a team-based event. Features, testing results and deployment details will be updated as development progresses.
+
+👥 Contributors
+
+Add contributor names, GitHub profiles and responsibilities.
+
+📄 License
+
+No license specified yet.
+
+Add a license before permitting reuse or redistribution.
+
+---
+
+Built for collaborative problem-solving, fair competition and a better event experience.
