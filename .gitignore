@@ -8,3 +8,5 @@ __pycache__/
 *backup*
 *.bak
 *.before*
+*.db-shm
+*.db-wal
