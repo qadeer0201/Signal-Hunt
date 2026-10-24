@@ -15,7 +15,7 @@ def get_db_path() -> Path:
     return Path(os.getenv('DATABASE_PATH', str(BASE.parent / 'signalhunt.db')))
 
 def get_admin_password() -> str:
-    return os.getenv('ADMIN_PASSWORD', 'change-this-before-deploying')
+    return os.getenv('ADMIN_PASSWORD', 'ISLIEEEECELL')
 
 # Fail-safe security check for production
 STRICT_SECURITY = os.getenv('STRICT_SECURITY', '0') == '1'
