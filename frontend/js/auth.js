@@ -57,13 +57,7 @@ window.Auth = {
       { name: "Red", code: "RED-2026", id: "red" },
       { name: "Black", code: "BLACK-2026", id: "black" },
       { name: "Navy Blue", code: "NAVY-2026", id: "navy" },
-      { name: "Yellow", code: "YELLOW-2026", id: "yellow" },
-      { name: "Orange", code: "ORANGE-2026", id: "orange" },
-      { name: "Green", code: "GREEN-2026", id: "green" },
-      { name: "Purple", code: "PURPLE-2026", id: "purple" },
-      { name: "Grey", code: "GREY-2026", id: "grey" },
-      { name: "Brown", code: "BROWN-2026", id: "brown" },
-      { name: "Peach", code: "PEACH-2026", id: "peach" }
+      { name: "Yellow", code: "YELLOW-2026", id: "yellow" }
     ];
     box.innerHTML = codes.map(c => `
       <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px dashed #cbbd96; font-size:0.8rem;">
