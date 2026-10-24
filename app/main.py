@@ -9,15 +9,17 @@ from pydantic import BaseModel, Field
 
 BASE = Path(__file__).parent
 FRONTEND = Path.home() / "Downloads" / "Signal-Hunt" / "frontend"
-ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'change-this-before-deploying')
 GAME_DURATION_SECONDS = 2 * 60 * 60  # 120 minutes
 
 def get_db_path() -> Path:
     return Path(os.getenv('DATABASE_PATH', str(BASE.parent / 'signalhunt.db')))
 
+def get_admin_password() -> str:
+    return os.getenv('ADMIN_PASSWORD', 'change-this-before-deploying')
+
 # Fail-safe security check for production
 STRICT_SECURITY = os.getenv('STRICT_SECURITY', '0') == '1'
-if STRICT_SECURITY and (not ADMIN_PASSWORD or ADMIN_PASSWORD == 'change-this-before-deploying'):
+if STRICT_SECURITY and (not get_admin_password() or get_admin_password() == 'change-this-before-deploying'):
     raise RuntimeError("CRITICAL SECURITY: ADMIN_PASSWORD must be configured with a secure secret in production.")
 
 app = FastAPI(title='Signal Hunt API', version='2.0.0')
@@ -175,9 +177,10 @@ def hash_answer(s: str) -> str:
 
 
 def admin_ok(password: str | None) -> bool:
-    if not password or not ADMIN_PASSWORD:
+    admin_pw = get_admin_password()
+    if not password or not admin_pw:
         return False
-    return hmac.compare_digest(password, ADMIN_PASSWORD)
+    return hmac.compare_digest(password, admin_pw)
 
 
 def require_admin(password: str | None, request_ip: str = "global"):
@@ -235,18 +238,6 @@ def read_game_state(c):
 # Team Progression Logic (4 Stations, 4 Riddles each = 16 Total)
 # ---------------------------------------------------------------------------
 def get_team_progression(c, team_id: int):
-    """
-    Calculates exact progress for a team based on station and riddle order.
-    Returns:
-      - solved_count (int)
-      - total_clues (int)
-      - completed (bool)
-      - current_clue (dict or None) -> Prompt of ONLY the current clue
-      - current_station (int)
-      - current_riddle (int)
-      - solved_clue_ids (set)
-    """
-    # Active clues in sequence: Station 1..4, Riddle 1..4
     all_clues = c.execute(
         "SELECT id, station, riddle_order, title, prompt "
         "FROM clues WHERE active=1 "
@@ -473,7 +464,7 @@ def reset_game(data: GameReset, x_admin_password: str | None = Header(default=No
 def register(data: Register, request: Request = None):
     ip = request.client.host if request and request.client else "global"
     reg_key = f"reg_{ip}"
-    if not rate_limiter.is_allowed(reg_key, max_requests=20, window_seconds=60):
+    if not rate_limiter.is_allowed(reg_key, max_requests=30, window_seconds=60):
         raise HTTPException(429, "Too many registration attempts. Please wait.")
 
     name = ' '.join(data.name.split())
@@ -548,7 +539,6 @@ def login(data: Login, request: Request = None):
         prog = get_team_progression(c, t['id'])
 
         # Security feature: DO NOT leak unreached clues!
-        # Return current clue and compatibility wrapper for frontend
         return {
             'team': {
                 'id': t['id'],
@@ -558,7 +548,6 @@ def login(data: Login, request: Request = None):
             'status': state['status'],
             'remaining_seconds': state['remaining_seconds'],
             'current_clue': prog['current_clue'],
-            # Compatibility list containing only the unlocked clue for the team
             'clues': [prog['current_clue']] if prog['current_clue'] else [],
             'progress': {
                 'solved_count': prog['solved_count'],
