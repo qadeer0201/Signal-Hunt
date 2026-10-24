@@ -7,12 +7,18 @@ window.SignalHuntData = {
     durationMinutes: 120
   },
 
-  // Exactly 4 event teams (max 5 participants per team)
+  // 10 Display Colours (Active event codes configured for Red, Black, Navy, Yellow)
   teams: [
-    { id: "red", name: "Red", color: "#c93636", icon: "⚑" },
-    { id: "black", name: "Black", color: "#171717", icon: "◆" },
-    { id: "navy", name: "Navy Blue", color: "#233e65", icon: "◈" },
-    { id: "yellow", name: "Yellow", color: "#e6c83d", icon: "✦" }
+    { id: "black", name: "Black", color: "#171717", icon: "◆", active: true },
+    { id: "red", name: "Red", color: "#c93636", icon: "⚑", active: true },
+    { id: "navy", name: "Navy Blue", color: "#233e65", icon: "◈", active: true },
+    { id: "yellow", name: "Yellow", color: "#e6c83d", icon: "✦", active: true },
+    { id: "orange", name: "Orange", color: "#e87832", icon: "ϟ", active: false },
+    { id: "green", name: "Green", color: "#26794b", icon: "❖", active: false },
+    { id: "purple", name: "Purple", color: "#743bb0", icon: "✧", active: false },
+    { id: "grey", name: "Grey", color: "#91949a", icon: "⬡", active: false },
+    { id: "brown", name: "Brown", color: "#75472e", icon: "⌘", active: false },
+    { id: "peach", name: "Peach", color: "#e9a08d", icon: "◉", active: false }
   ],
 
   stations: [

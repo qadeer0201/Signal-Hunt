@@ -39,8 +39,13 @@ window.Auth = {
     const input = document.getElementById("team-colour");
     if (input) input.value = teamId;
     const codeInput = document.getElementById("team-code");
+    const activeColours = ["red", "black", "navy", "yellow"];
     if (codeInput && teamId) {
-      codeInput.placeholder = `e.g. ${teamId.toUpperCase()}-2026`;
+      if (activeColours.includes(teamId)) {
+        codeInput.placeholder = `e.g. ${teamId.toUpperCase()}-2026`;
+      } else {
+        codeInput.placeholder = "Team inactive for this event";
+      }
     }
     document.querySelectorAll(".team-choice").forEach(button => {
       const selected = button.dataset.teamId === teamId;
@@ -88,6 +93,10 @@ window.Auth = {
     const code = teamCodeInput ? teamCodeInput.value.trim() : "";
 
     if (!teamId) return this.showError("Select your team colour to establish your signal.");
+    const activeColours = ["red", "black", "navy", "yellow"];
+    if (!activeColours.includes(teamId)) {
+      return this.showError("This team colour is not active in this event. Active teams: Red, Black, Navy Blue, and Yellow.");
+    }
     if (!code) return this.showError("Enter your team access code.");
 
     const result = await window.SignalHuntAPI.login(teamId, code);
