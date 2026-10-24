@@ -475,8 +475,10 @@ def register(data: Register, request: Request = None):
     try:
         with connect() as c:
             team_count = c.execute('SELECT COUNT(*) FROM teams').fetchone()[0]
-            if team_count >= 4:
-                raise HTTPException(409, 'The event is limited to four teams.')
+            max_teams = int(os.getenv('MAX_TEAMS', '10'))
+            if team_count >= max_teams:
+                limit_word = "four" if max_teams == 4 else str(max_teams)
+                raise HTTPException(409, f'The event is limited to {limit_word} teams.')
 
             if colour:
                 existing_colour = c.execute('SELECT id FROM teams WHERE colour=?', (colour,)).fetchone()
