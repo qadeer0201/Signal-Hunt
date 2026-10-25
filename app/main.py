@@ -159,6 +159,29 @@ def init_db():
         if 'colour' not in teams_cols:
             c.execute("ALTER TABLE teams ADD COLUMN colour TEXT DEFAULT ''")
 
+        # Ensure all 12 event teams are pre-seeded
+        default_teams = [
+            ("Team Red", "red", "REDRACERS2026"),
+            ("Team Black", "black", "BLACKPANTHERS2026"),
+            ("Team Navy", "navy", "NAVYSHIPS2026"),
+            ("Team Yellow", "yellow", "YELLOWYELLOW2026"),
+            ("Team Orange", "orange", "ORANGEBLAZE2026"),
+            ("Team Green", "green", "GREENVIPERS2026"),
+            ("Team Purple", "purple", "PURPLESTORM2026"),
+            ("Team Grey", "grey", "GREYSHADOWS2026"),
+            ("Team Brown", "brown", "BROWNTITANS2026"),
+            ("Team Peach", "peach", "PEACHPULSE2026"),
+            ("Team Cyan", "cyan", "CYANBEACON2026"),
+            ("Team White", "white", "WHITEGHOSTS2026")
+        ]
+        for t_name, t_col, t_code in default_teams:
+            exists = c.execute("SELECT id FROM teams WHERE colour=? OR name=?", (t_col, t_name)).fetchone()
+            if not exists:
+                c.execute(
+                    "INSERT INTO teams(name, colour, code_hash, created_at) VALUES(?,?,?,?)",
+                    (t_name, t_col, hashlib.sha256(t_code.encode()).hexdigest(), now())
+                )
+
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -186,16 +209,22 @@ def admin_ok(password: str | None) -> bool:
     admin_pw = get_admin_password()
     if not password or not admin_pw:
         return False
-    return hmac.compare_digest(password, admin_pw)
+    return hmac.compare_digest(password.strip(), admin_pw.strip())
 
 
 def require_admin(password: str | None, request_ip: str = "global"):
     fail_key = f"admin_fail_{request_ip}"
-    if not rate_limiter.check(fail_key, max_requests=10, window_seconds=300):
+    if admin_ok(password):
+        # Successful organizer authentication: immediately clear fail counter
+        if fail_key in rate_limiter.history:
+            rate_limiter.history[fail_key] = []
+        return
+
+    # Check rate limiter on failed attempts (30 attempts per 60 seconds)
+    if not rate_limiter.check(fail_key, max_requests=30, window_seconds=60):
         raise HTTPException(429, "Too many failed attempts. Organizer endpoints locked temporarily.")
-    if not admin_ok(password):
-        rate_limiter.record(fail_key)
-        raise HTTPException(401, "Organizer authentication failed.")
+    rate_limiter.record(fail_key)
+    raise HTTPException(401, "Organizer authentication failed.")
 
 
 def get_team_by_code(c, code: str):
@@ -486,10 +515,9 @@ def register(data: Register, request: Request = None):
     try:
         with connect() as c:
             team_count = c.execute('SELECT COUNT(*) FROM teams').fetchone()[0]
-            max_teams = int(os.getenv('MAX_TEAMS', '4'))
+            max_teams = int(os.getenv('MAX_TEAMS', '12'))
             if team_count >= max_teams:
-                limit_word = "four" if max_teams == 4 else str(max_teams)
-                raise HTTPException(409, f'The event is limited to {limit_word} teams.')
+                raise HTTPException(409, f'The event is limited to {max_teams} teams.')
 
             if colour:
                 existing_colour = c.execute('SELECT id FROM teams WHERE colour=?', (colour,)).fetchone()
@@ -529,7 +557,7 @@ def login(data: Login, request: Request = None):
         if t['eliminated']:
             raise HTTPException(403, 'This team has been eliminated. Contact an organizer.')
 
-        # Enforce max 5 participants per team
+        # Enforce max 5 participants per team and max 60 total event participants
         if data.device_id:
             device_id = data.device_id.strip()
             participant = c.execute(
@@ -541,8 +569,15 @@ def login(data: Login, request: Request = None):
                     'SELECT COUNT(*) FROM participants WHERE team_id=?',
                     (t['id'],)
                 ).fetchone()[0]
-                if p_count >= 5:
-                    raise HTTPException(403, 'Team participant limit reached (maximum 5 participants per team).')
+                max_team_participants = int(os.getenv('MAX_PARTICIPANTS_PER_TEAM', '5'))
+                if p_count >= max_team_participants:
+                    raise HTTPException(403, f'Team participant limit reached (maximum {max_team_participants} participants per team).')
+
+                total_p = c.execute('SELECT COUNT(*) FROM participants').fetchone()[0]
+                max_total_participants = int(os.getenv('MAX_TOTAL_PARTICIPANTS', '60'))
+                if total_p >= max_total_participants:
+                    raise HTTPException(403, f'Total event participant limit reached (maximum {max_total_participants} participants).')
+
                 c.execute(
                     'INSERT INTO participants(team_id, device_id, created_at) VALUES(?,?,?)',
                     (t['id'], device_id, now())
