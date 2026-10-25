@@ -39,7 +39,9 @@ window.Auth = {
     const input = document.getElementById("team-colour");
     if (input) input.value = teamId;
     const codeInput = document.getElementById("team-code");
-    const activeColours = ["red", "black", "navy", "yellow"];
+    const activeColours = (window.SignalHuntData && window.SignalHuntData.teams)
+      ? window.SignalHuntData.teams.map(t => t.id)
+      : ["red", "black", "navy", "yellow", "orange", "green", "purple", "grey", "brown", "peach", "cyan", "white"];
     if (codeInput && teamId) {
       if (activeColours.includes(teamId)) {
         codeInput.placeholder = "Enter your team access code…";
@@ -59,10 +61,18 @@ window.Auth = {
     const box = document.getElementById("demo-team-codes");
     if (!box) return;
     const codes = [
-      { name: "Red", code: "RED-2026", id: "red" },
-      { name: "Black", code: "BLACK-2026", id: "black" },
-      { name: "Navy Blue", code: "NAVY-2026", id: "navy" },
-      { name: "Yellow", code: "YELLOW-2026", id: "yellow" }
+      { name: "Red", code: "REDRACERS2026", id: "red" },
+      { name: "Black", code: "BLACKPANTHERS2026", id: "black" },
+      { name: "Navy Blue", code: "NAVYSHIPS2026", id: "navy" },
+      { name: "Yellow", code: "YELLOWYELLOW2026", id: "yellow" },
+      { name: "Orange", code: "ORANGEBLAZE2026", id: "orange" },
+      { name: "Green", code: "GREENVIPERS2026", id: "green" },
+      { name: "Purple", code: "PURPLESTORM2026", id: "purple" },
+      { name: "Grey", code: "GREYSHADOWS2026", id: "grey" },
+      { name: "Brown", code: "BROWNTITANS2026", id: "brown" },
+      { name: "Peach", code: "PEACHPULSE2026", id: "peach" },
+      { name: "Cyan", code: "CYANBEACON2026", id: "cyan" },
+      { name: "White", code: "WHITEGHOSTS2026", id: "white" }
     ];
     box.innerHTML = codes.map(c => `
       <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px dashed #cbbd96; font-size:0.8rem;">
@@ -93,9 +103,11 @@ window.Auth = {
     const code = teamCodeInput ? teamCodeInput.value.trim() : "";
 
     if (!teamId) return this.showError("Select your team colour to establish your signal.");
-    const activeColours = ["red", "black", "navy", "yellow"];
+    const activeColours = (window.SignalHuntData && window.SignalHuntData.teams)
+      ? window.SignalHuntData.teams.map(t => t.id)
+      : ["red", "black", "navy", "yellow", "orange", "green", "purple", "grey", "brown", "peach", "cyan", "white"];
     if (!activeColours.includes(teamId)) {
-      return this.showError("This team colour is not active in this event. Active teams: Red, Black, Navy Blue, and Yellow.");
+      return this.showError("Selected team colour is not active for this event.");
     }
     if (!code) return this.showError("Enter your team access code.");
 

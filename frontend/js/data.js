@@ -7,18 +7,20 @@ window.SignalHuntData = {
     durationMinutes: 120
   },
 
-  // 10 Display Colours (Active event codes configured for Red, Black, Navy, Yellow)
+  // 12 Event Teams (Max 60 participants, 5 per team)
   teams: [
-    { id: "black", name: "Black", color: "#171717", icon: "◆", active: true },
     { id: "red", name: "Red", color: "#c93636", icon: "⚑", active: true },
+    { id: "black", name: "Black", color: "#171717", icon: "◆", active: true },
     { id: "navy", name: "Navy Blue", color: "#233e65", icon: "◈", active: true },
     { id: "yellow", name: "Yellow", color: "#e6c83d", icon: "✦", active: true },
-    { id: "orange", name: "Orange", color: "#e87832", icon: "ϟ", active: false },
-    { id: "green", name: "Green", color: "#26794b", icon: "❖", active: false },
-    { id: "purple", name: "Purple", color: "#743bb0", icon: "✧", active: false },
-    { id: "grey", name: "Grey", color: "#91949a", icon: "⬡", active: false },
-    { id: "brown", name: "Brown", color: "#75472e", icon: "⌘", active: false },
-    { id: "peach", name: "Peach", color: "#e9a08d", icon: "◉", active: false }
+    { id: "orange", name: "Orange", color: "#e87832", icon: "ϟ", active: true },
+    { id: "green", name: "Green", color: "#26794b", icon: "❖", active: true },
+    { id: "purple", name: "Purple", color: "#743bb0", icon: "✧", active: true },
+    { id: "grey", name: "Grey", color: "#91949a", icon: "⬡", active: true },
+    { id: "brown", name: "Brown", color: "#75472e", icon: "⌘", active: true },
+    { id: "peach", name: "Peach", color: "#e9a08d", icon: "◉", active: true },
+    { id: "cyan", name: "Cyan", color: "#17b8be", icon: "▲", active: true },
+    { id: "white", name: "White", color: "#e2e8f0", icon: "☼", active: true }
   ],
 
   stations: [

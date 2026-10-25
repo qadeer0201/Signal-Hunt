@@ -38,10 +38,24 @@
     password.value = savedPass;
   }
 
+  let passDebounce = null;
   if (password) {
     password.addEventListener("input", () => {
       sessionStorage.setItem("sh_admin_password", password.value.trim());
+      clearTimeout(passDebounce);
+      passDebounce = setTimeout(() => {
+        refresh();
+      }, 400);
+    });
+    password.addEventListener("change", () => {
+      clearTimeout(passDebounce);
       refresh();
+    });
+    password.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        clearTimeout(passDebounce);
+        refresh();
+      }
     });
   }
 
@@ -148,8 +162,8 @@
       `;
     }).join("");
 
-    if (summaryTeams) summaryTeams.textContent = `${teams.length} / 4`;
-    if (summaryDevices) summaryDevices.textContent = `${totalDevices} connected participant devices (max 20)`;
+    if (summaryTeams) summaryTeams.textContent = `${teams.length} / 12`;
+    if (summaryDevices) summaryDevices.textContent = `${totalDevices} connected participant devices (max 60)`;
     if (summarySolved) summarySolved.textContent = `${totalSolves} total riddle solves confirmed`;
   }
 
