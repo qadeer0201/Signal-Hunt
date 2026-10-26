@@ -4,56 +4,172 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0a0b09">
-  <title>Signal Hunt — Host Dashboard (Prototype)</title>
+  <link rel="icon" type="image/webp" href="/assets/signal-hunt-logo.webp">
+  <title>Signal Hunt — Organizer Dashboard</title>
   <link rel="stylesheet" href="styles/base.css">
   <link rel="stylesheet" href="styles/components.css">
   <link rel="stylesheet" href="styles/pages/host.css">
+  <style>
+    .host-section-title{font:900 1.2rem var(--display);color:var(--text);letter-spacing:.05em;margin:24px 0 12px}
+    .host-teams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:10px}
+    .host-team-card{padding:14px;border:1px solid #424832;border-radius:8px;background:rgba(16,20,12,.95);display:flex;flex-direction:column;gap:8px}
+    .host-team-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .host-team-name-row{display:flex;align-items:center;gap:8px;min-width:0}
+    .team-swatch{width:14px;height:14px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,.4);flex:0 0 auto}
+    .host-team-title{font:800 .95rem var(--display);color:var(--text);overflow-wrap:anywhere}
+    .team-badge{font:800 .65rem var(--mono);padding:3px 7px;border-radius:4px;text-transform:uppercase;white-space:nowrap}
+    .badge-playing{background:#26794b;color:#fff}.badge-completed{background:#d8ff36;color:#171717}.badge-eliminated{background:#c93636;color:#fff}
+    .host-team-stats{font:700 .75rem var(--mono);color:var(--muted);display:flex;flex-direction:column;gap:5px}
+    .host-team-stats b{color:var(--text)}
+    .progress-bar-bg{width:100%;height:6px;background:#2a2f1e;border-radius:3px;overflow:hidden;margin-top:4px}
+    .progress-bar-fill{height:100%;background:var(--lime);width:0%;transition:width .25s ease}
+    .host-panel-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .level-time-card{border:1px solid #3c4528;border-radius:8px;background:#10130c;padding:12px;display:flex;flex-direction:column;gap:7px;min-width:0}
+    .level-time-card label{font:800 .72rem var(--mono);color:var(--lime)}
+    .level-time-card input{width:100%;min-width:0}
+    .host-riddles-container{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .station-accordion{border:1px solid #3c4528;border-radius:8px;overflow:hidden;background:rgba(10,12,8,.94)}
+    .station-accordion-header{padding:10px 14px;background:#1c2214;display:flex;align-items:center;justify-content:space-between;gap:8px;font:800 .85rem var(--display);color:var(--text)}
+    .station-riddles-list{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+    .riddle-item{padding:9px 10px;border:1px solid #2f3620;border-radius:6px;background:rgba(20,24,16,.8);display:flex;align-items:flex-start;justify-content:space-between;gap:10px;font-size:.78rem}
+    .riddle-item-info{display:flex;flex-direction:column;gap:4px;min-width:0}.riddle-item-info strong{color:var(--text)}.riddle-item-info small{color:var(--muted);line-height:1.4;overflow-wrap:anywhere}
+    .host-log-table{width:100%;border-collapse:collapse;font:700 .72rem var(--mono);color:var(--text);margin-top:10px}
+    .host-log-table th{text-align:left;padding:8px;border-bottom:1px solid #3c4528;color:var(--lime)}.host-log-table td{padding:7px 8px;border-bottom:1px solid #1f2516;vertical-align:top}
+    .log-success{color:#d8ff36}.log-fail{color:#e87832}.log-alert{color:#ff6b6b;font-weight:bold}
+    .host-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9999;padding:15px}
+    .host-modal-box{width:min(94%,520px);max-height:90dvh;overflow:auto;background:#181d12;border:1px solid var(--lime);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:12px}
+    .host-modal-box h3{margin:0;color:var(--text);font:900 1.2rem var(--display)}.host-modal-box p{font-size:.82rem;color:#c7c0aa;margin:0;line-height:1.45}
+    .host-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .host-form-field{display:flex;flex-direction:column;gap:5px;min-width:0}.host-form-field.full{grid-column:1/-1}
+    .host-form-field input,.host-form-field select,.host-form-field textarea{width:100%;min-width:0}
+    .host-note{font-size:.76rem;color:var(--muted);line-height:1.5;margin:8px 0 0}
+    .host-route-status{font:700 .72rem var(--mono);color:var(--muted)}
+    [hidden]{display:none!important}
+    @media(max-width:680px){.host-panel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.host-form-grid{grid-template-columns:1fr}.host-form-field.full{grid-column:auto}#form-team .host-form-grid{grid-template-columns:1fr}.host-panel-heading{align-items:flex-start}}
+    @media(max-width:390px){.host-panel-grid{grid-template-columns:1fr 1fr}.host-team-card{padding:11px}.host-team-header{align-items:flex-start}}
+    .host-shell{width:min(100% - 28px,1180px);padding:18px 0 48px}
+    .host-flow-panel,.host-status-panel,.host-summary-card,.host-team-card{min-width:0}
+    .host-flow-panel{overflow:hidden}
+    .host-panel-heading{align-items:flex-start}
+    .host-panel-heading>div{min-width:0}
+    .host-panel-heading .host-action-message{max-width:78ch;line-height:1.55;overflow-wrap:anywhere}
+    .host-form-grid{column-gap:14px;row-gap:14px;align-items:end}
+    .host-form-field{min-width:0;gap:7px}
+    .host-form-field>button{width:100%;max-width:340px;align-self:flex-start}
+    .host-form-field.full>button{max-width:none}
+    .host-form-field input,.host-form-field select,.host-form-field textarea{box-sizing:border-box}
+    .host-action-message,.host-note,.host-route-status{max-width:100%;overflow-wrap:anywhere;line-height:1.55}
+    .host-panel-grid{align-items:stretch}
+    .host-level-list li{min-width:0}
+    .host-log-table{min-width:680px}
+    #route-random-preview,#team-csv-preview-table,#route-csv-preview-table{max-width:100%;overflow-x:auto}
+    .host-team-card>div[style*="display:flex"]{align-items:flex-start}
+    .host-team-actions{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;margin-top:4px}
+    .host-team-actions .btn{width:auto;max-width:100%;white-space:normal}
+    @media(max-width:680px){.host-shell{width:min(100% - 20px,600px);padding-top:10px}.host-flow-panel{padding:12px}.host-form-grid{grid-template-columns:1fr}.host-form-field.full{grid-column:auto}.host-panel-heading{align-items:flex-start}.host-panel-heading h2{font-size:1.05rem}.host-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.host-actions{grid-template-columns:1fr 1fr}.host-status-top{align-items:flex-start}}
+    @media(max-width:390px){.host-actions,.host-summary-grid{grid-template-columns:1fr}.host-status-top{flex-direction:column}.host-team-header{align-items:flex-start}.host-panel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
 </head>
 <body>
   <main class="host-shell">
     <header class="host-header">
-      <a class="host-brand" href="index.html"><img src="assets/signal-hunt-logo.webp" alt=""><span><strong>SIGNAL HUNT</strong><small>HOST CONTROL · PROTOTYPE</small></span></a>
+      <a class="host-brand" href="index.html"><img src="assets/signal-hunt-logo.webp" alt="Signal Hunt logo"><span><strong>SIGNAL HUNT</strong><small>ORGANIZER CONTROL · PRIVATE</small></span></a>
       <a class="btn btn-secondary btn-compact" href="index.html">OPEN PARTICIPANT VIEW ↗</a>
     </header>
 
     <section class="host-intro">
-      <p class="section-kicker">ORGANISED TRANSMISSION CONTROL</p>
+      <p class="section-kicker">ORGANIZER CONTROL PANEL</p>
       <h1>HOST DASHBOARD</h1>
-      <p>Use this page to preview how an authorised host will start Signal Hunt.</p>
-      <div class="host-warning"><strong>PROTOTYPE ONLY</strong><span>This demo has no host authentication. It syncs only between tabs using the same browser and local origin. It does not start the game on other phones. Do not deploy it as a real host control panel.</span></div>
+      <p>Manage teams, each team's physical route, envelope verification codes, level timers and game state. The official winner is confirmed by the physical finish volunteer.</p>
     </section>
 
     <section class="host-status-panel paper-card" aria-live="polite">
-      <div class="host-status-top"><div><p class="section-kicker">GAME STATUS</p><h2 id="host-status-title">STATUS: AWAITING THE SIGNAL</h2></div><span id="host-status-badge" class="host-status-badge">STANDBY</span></div>
-      <p id="host-status-description">Participants can review Mission, Knowledge, Rules, Security and the Campus Map while waiting.</p>
+      <div class="host-status-top"><div><p class="section-kicker">EVENT STATUS</p><h2 id="host-status-title">STATUS: AWAITING THE SIGNAL</h2></div><span id="host-status-badge" class="host-status-badge">STANDBY</span></div>
+      <p id="host-status-description">Authenticate to configure the event.</p>
       <div class="host-actions">
-        <button id="host-start-button" class="btn btn-primary btn-wide" type="button">START CHALLENGE <span aria-hidden="true">→</span></button>
-        <button id="host-reset-button" class="btn btn-secondary btn-wide" type="button">RESET LOCAL DEMO</button>
+        <button id="host-start-button" class="btn btn-primary btn-wide" type="button">START CHALLENGE →</button>
+        <button id="host-reset-button" class="btn btn-secondary btn-wide" type="button">PAUSE GAME</button>
+        <button id="host-finish-button" class="btn btn-secondary btn-wide" type="button">FINISH GAME</button>
+        <button id="host-rearm-button" class="btn btn-secondary btn-wide" type="button">RESET GAME PROGRESS</button>
+        <button id="host-event-reset-button" class="btn btn-danger btn-wide" type="button">RESET EVENT SETUP</button>
       </div>
-      <p id="host-action-message" class="host-action-message" role="status" aria-live="polite">No real teams are connected in this prototype.</p>
+      <p id="host-action-message" class="host-action-message" role="status" aria-live="polite">Organizer session loading…</p>
+      <button id="host-logout-button" type="button" class="btn btn-secondary btn-compact">SIGN OUT</button>
     </section>
 
-    <section class="host-summary-grid" aria-label="Prototype configuration">
-      <article class="host-summary-card"><span class="host-summary-icon">◈</span><strong>10</strong><span>Team colours configured</span><small>Mock roster · not attendance</small></article>
-      <article class="host-summary-card"><span class="host-summary-icon">⌘</span><strong>4</strong><span>Challenge levels</span><small>Morse · Binary · FSK · Final</small></article>
+    <section class="host-summary-grid" aria-label="Live event summary">
+      <article class="host-summary-card"><span class="host-summary-icon">◈</span><strong id="summary-active-teams">—</strong><span>Registered Teams</span><small id="summary-devices-count">0 registered devices</small></article>
+      <article class="host-summary-card"><span class="host-summary-icon">⌘</span><strong id="summary-active-clues">0 / 16</strong><span>Configured Team Levels</span><small id="summary-solved-count">0 level completions recorded</small></article>
     </section>
 
     <section class="host-flow-panel">
-      <div class="host-panel-heading"><div><p class="section-kicker">EVENT FLOW</p><h2>CHALLENGE SEQUENCE</h2></div><span class="section-id">4 LEVELS</span></div>
-      <ol class="host-level-list">
-        <li><span>01</span><div><strong>Morse Code</strong><small>Decode the rhythm.</small></div><b>→</b></li>
-        <li><span>02</span><div><strong>Binary ASCII</strong><small>Read the digital trail.</small></div><b>→</b></li>
-        <li><span>03</span><div><strong>FSK Signals</strong><small>Follow the frequency shift.</small></div><b>→</b></li>
-        <li><span>04</span><div><strong>Final Challenge</strong><small>Combine what the team learned.</small></div><b>✓</b></li>
-      </ol>
+      <div class="host-panel-heading"><div><p class="section-kicker">ORGANIZER SETUP</p><h2>TEAM &amp; ACCESS CODE SETUP</h2></div></div>
+      <p id="event-profile-note" class="host-action-message">One event setup · 4–10 teams · 3–5 members per team.</p>
+      <form id="form-team" class="host-form-grid">
+        <div class="host-form-field"><label class="field-label" for="team-name">TEAM NAME</label><input id="team-name" class="text-input" type="text" minlength="2" maxlength="60" placeholder="e.g. Red Racers" required></div>
+        <div class="host-form-field"><label class="field-label" for="team-colour-select">TEAM COLOUR</label><select id="team-colour-select" class="text-input" required></select></div>
+        <div class="host-form-field"><label class="field-label" for="team-size">TEAM MEMBERS (3–5)</label><select id="team-size" class="text-input" required><option value="3">3 members</option><option value="4">4 members</option><option value="5" selected>5 members</option></select></div>
+        <div class="host-form-field"><label class="field-label" for="team-access-code">CUSTOM TEAM LOGIN CODE</label><input id="team-access-code" class="text-input" type="text" minlength="8" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9_-]{7,31}" autocomplete="off" placeholder="Unique 8+ character code you choose" required></div>
+        <div class="host-form-field full"><button id="btn-create-team" class="btn btn-primary btn-wide" type="submit">CREATE TEAM</button><p class="host-note">Choose a unique, hard-to-guess code of 8–32 letters, numbers, hyphens or underscores. Avoid predictable team names or colour-only codes. The backend stores only a hash. Keep your organizer sheet secure; do not reuse codes that were shared previously.</p></div>
+      </form>
+      <p id="team-action-message" class="host-action-message" role="status" aria-live="polite">Organizer session required.</p>
+      <div id="team-created-panel" hidden style="border:1px solid var(--lime);border-radius:8px;padding:12px;margin-top:10px;background:#151a0f"><strong style="display:block;color:var(--lime);margin-bottom:6px">TEAM CREATED — SAVE ITS CODE</strong><p style="margin:0 0 8px;color:var(--text);font-size:.8rem">This is the code you entered. Share it privately only with members of this team.</p><code id="team-created-code" style="display:block;overflow-wrap:anywhere;padding:10px;background:#090b07;color:var(--lime);font-size:1rem"></code><button id="btn-copy-team-code" type="button" class="btn btn-secondary btn-compact" style="margin-top:8px">COPY TEAM CODE</button></div>
+      <div class="host-form-grid" style="margin-top:12px"><div class="host-form-field"><button id="team-csv-template" type="button" class="btn btn-secondary">DOWNLOAD TEAM CSV TEMPLATE</button></div><div class="host-form-field"><label class="field-label" for="team-csv-file">UPLOAD TEAM CSV</label><input id="team-csv-file" class="text-input" type="file" accept=".csv,text/csv"></div><div class="host-form-field"><button id="team-csv-preview" type="button" class="btn btn-secondary">PREVIEW IMPORT</button><button id="team-csv-confirm" type="button" class="btn btn-primary" disabled>CONFIRM IMPORT</button></div></div><div id="team-csv-feedback" class="host-action-message" role="status" aria-live="polite"></div><div id="team-csv-preview-table"></div>
     </section>
 
-    <footer class="host-footer">
-      <p><strong>For backend integration:</strong> a protected host endpoint must save the official game status. Participant devices must read that status from the backend. This local control is only for UI testing.</p>
-      <a href="README.md">Read frontend setup notes</a>
-    </footer>
+    <section>
+      <h2 class="host-section-title">TEAM PROGRESS &amp; SECURITY</h2>
+      <div id="host-teams-grid" class="host-teams-grid"><p style="color:var(--muted);font-size:.8rem">Authenticate to inspect teams.</p></div>
+    </section>
+
+    <section class="host-flow-panel">
+      <div class="host-panel-heading"><div><p class="section-kicker">LEVEL CONTROL</p><h2>PER-LEVEL TIME LIMITS</h2><p class="host-action-message">Timers run per team, beginning when the level starts. A team's timer continues while that team is eliminated. Time limits can be adjusted by the organizer.</p></div></div>
+      <form id="form-level-times">
+        <div id="level-times-container" class="host-panel-grid"></div>
+        <button id="btn-save-level-times" type="submit" class="btn btn-primary btn-wide" style="margin-top:12px">SAVE LEVEL TIME LIMITS</button>
+      </form>
+      <p id="level-times-message" class="host-action-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="host-flow-panel">
+      <div class="host-panel-heading"><div><p class="section-kicker">PHYSICAL ENVELOPE MANAGEMENT</p><h2>TEAM ROUTES &amp; ENVELOPE CODES</h2><p class="host-action-message">Set a different physical route for each team. Station markers A–D and riddle notes are organizer-only; participants only see their level progress and enter the code found inside the physical envelope.</p></div></div>
+      <form id="form-team-level" class="host-form-grid">
+        <div class="host-form-field"><label class="field-label" for="route-team">TEAM</label><select id="route-team" class="text-input" required></select></div>
+        <div class="host-form-field"><label class="field-label" for="route-level">LEVEL</label><select id="route-level" class="text-input" required><option value="1">Level 1 · Morse</option><option value="2">Level 2 · Binary</option><option value="3">Level 3 · FSK</option><option value="4">Level 4 · Combined</option></select></div>
+        <div class="host-form-field"><label class="field-label" for="route-station">INTERNAL PHYSICAL STATION</label><select id="route-station" class="text-input" required><option value="A">Station A</option><option value="B">Station B</option><option value="C">Station C</option><option value="D">Station D</option></select></div>
+        <div class="host-form-field"><label class="field-label" for="route-code">ENVELOPE VERIFICATION CODE</label><input id="route-code" class="text-input" type="text" minlength="8" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9_-]{7,31}" autocomplete="off" placeholder="Enter a unique 8+ character code"></div>
+        <div class="host-form-field full"><label class="field-label" for="route-riddle-notes">PHYSICAL RIDDLE / ORGANIZER NOTES</label><textarea id="route-riddle-notes" class="text-input" rows="4" maxlength="4000" placeholder="Record the riddle printed in the envelope, decoded word, physical destination, and setup notes. This stays on the organizer dashboard and is never shown to participants." required></textarea></div>
+        <div class="host-form-field full"><p id="route-puzzle-note" class="host-note">Puzzle type is set by level. Assign each team all four internal station markers A, B, C and D exactly once.</p><button id="btn-save-team-level" class="btn btn-primary btn-wide" type="submit">SAVE TEAM LEVEL SETUP</button></div>
+      </form>
+      <p id="route-action-message" class="host-action-message" role="status" aria-live="polite"></p>
+      <p id="route-save-status" class="host-route-status" role="status" aria-live="polite">Saved state will appear here.</p>
+      <div class="host-form-grid" style="margin:12px 0"><div class="host-form-field"><button id="route-csv-template" type="button" class="btn btn-secondary">DOWNLOAD ROUTE CSV TEMPLATE</button><button id="route-csv-export" type="button" class="btn btn-secondary">EXPORT ROUTE MATRIX</button></div><div class="host-form-field"><label class="field-label" for="route-csv-file">UPLOAD ROUTE CSV</label><input id="route-csv-file" class="text-input" type="file" accept=".csv,text/csv"></div><div class="host-form-field"><button id="route-csv-preview" type="button" class="btn btn-secondary">PREVIEW IMPORT</button><button id="route-csv-confirm" type="button" class="btn btn-primary" disabled>CONFIRM IMPORT</button></div></div><div id="route-csv-feedback" class="host-action-message" role="status" aria-live="polite"></div><div id="route-csv-preview-table"></div>
+      <div class="host-flow-panel" style="margin-top:14px"><h3>Balanced Random A/B/C/D Routes</h3><p class="host-note">Generates a preview using station identifiers A, B, C and D. Confirming replaces saved station assignments while preserving envelope verification codes and organizer notes.</p><button id="route-random-generate" type="button" class="btn btn-secondary">GENERATE BALANCED RANDOM ROUTES</button><button id="route-random-regenerate" type="button" class="btn btn-secondary" disabled>REGENERATE PREVIEW</button><button id="route-random-confirm" type="button" class="btn btn-primary" disabled>CONFIRM AND SAVE</button><div id="route-random-preview" style="overflow-x:auto"></div><p id="route-random-feedback" class="host-action-message" role="status" aria-live="polite"></p></div>
+      <div id="host-riddles-container" class="host-riddles-container"><p class="host-note">Authenticate to view route setup.</p></div>
+    </section>
+
+    <section class="host-flow-panel">
+      <div class="host-panel-heading"><div><p class="section-kicker">AUDIT LOG</p><h2>LIVE ACTIVITY &amp; SECURITY EVENTS</h2></div><span id="log-count-badge" class="section-id">0 EVENTS</span></div>
+      <div class="host-form-grid" style="align-items:end;margin-top:10px">
+        <label class="host-form-field">FILTER TEAM<select id="audit-team-filter" class="text-input"><option value="">All teams</option></select></label>
+        <label class="host-form-field">FILTER EVENT TYPE<input id="audit-kind-filter" class="text-input" type="search" maxlength="50" placeholder="e.g. team_auth_failed"></label>
+        <div class="host-form-field"><button id="audit-filter-button" type="button" class="btn btn-secondary">APPLY FILTER</button></div>
+        <div class="host-form-field" style="display:flex;flex-direction:row;align-items:center;gap:8px"><button id="audit-prev" type="button" class="btn btn-secondary">← NEWER</button><span id="audit-page-label" class="host-note">Page 1</span><button id="audit-next" type="button" class="btn btn-secondary">OLDER →</button></div>
+      </div>
+      <div style="overflow-x:auto"><table class="host-log-table"><thead><tr><th>TIME</th><th>TEAM</th><th>EVENT</th><th>DETAILS</th></tr></thead><tbody id="host-log-tbody"><tr><td colspan="4" style="color:var(--muted);text-align:center">No activity recorded yet.</td></tr></tbody></table></div>
+    </section>
+    <footer class="host-footer"><p><strong>Organizer note:</strong> level completion is tracked by the server; physical volunteers determine the official finish order at Rooms 7 &amp; 8. This dashboard does not award points or select a winner.</p></footer>
   </main>
+
+  <div id="modal-rearm" class="host-modal-overlay" hidden><div class="host-modal-box" style="border-color:#c93636"><h3 style="color:#ff6b6b">CONFIRM EVENT RE-ARM</h3><p>This resets level progress, level timers and eliminations while preserving teams, access codes, routes and riddle notes.</p><label class="field-label">Type <strong>RESET_SIGNAL_HUNT</strong> to confirm:</label><input type="text" id="rearm-confirm-input" class="text-input" placeholder="RESET_SIGNAL_HUNT" autocomplete="off"><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px"><button type="button" id="btn-cancel-rearm" class="btn btn-secondary btn-compact">CANCEL</button><button type="button" id="btn-confirm-rearm" class="btn btn-danger btn-compact">RESET &amp; RE-ARM</button></div></div></div>
+
+  <div id="modal-event-reset" class="host-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="event-reset-title" hidden><div class="host-modal-box" style="border-color:#c93636"><h3 id="event-reset-title" style="color:#ff6b6b">RESET ALL EVENT SETUP?</h3><p>This removes all teams, route assignments, envelope codes, participant registrations, progress and event activity from the current database. First it creates and verifies a recoverable backup outside the public website folder. Your organizer password and app settings are retained. The action is unavailable while the game is active or paused.</p><label class="field-label" for="event-reset-confirm-input">Type <strong>RESET EVENT</strong> to continue:</label><input type="text" id="event-reset-confirm-input" class="text-input" autocomplete="off"><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px"><button type="button" id="btn-cancel-event-reset" class="btn btn-secondary btn-compact">CANCEL</button><button type="button" id="btn-confirm-event-reset" class="btn btn-danger btn-compact">BACK UP &amp; RESET</button></div><p id="event-reset-feedback" role="status" aria-live="polite"></p></div></div>
+
+  <div id="modal-game-confirm" class="host-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="game-confirm-title" hidden><div class="host-modal-box"><h3 id="game-confirm-title">CONFIRM GAME ACTION</h3><p id="game-confirm-description"></p><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px"><button type="button" id="btn-cancel-game-action" class="btn btn-secondary btn-compact">CANCEL</button><button type="button" id="btn-confirm-game-action" class="btn btn-primary btn-compact">CONFIRM</button></div></div></div>
+
+  <div id="modal-edit-team" class="host-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-team-title" hidden><form id="form-edit-team" class="host-modal-box"><h3 id="edit-team-title">EDIT TEAM DETAILS</h3><p>Changes apply to this team only. Its login code, routes, notes, progress and audit history stay with it.</p><label class="field-label" for="edit-team-name">TEAM NAME</label><input id="edit-team-name" class="text-input" minlength="2" maxlength="60" required><label class="field-label" for="edit-team-colour">TEAM COLOUR</label><select id="edit-team-colour" class="text-input" required></select><label class="field-label" for="edit-team-size">TEAM MEMBER LIMIT</label><select id="edit-team-size" class="text-input"><option value="3">3 members</option><option value="4">4 members</option><option value="5">5 members</option></select><p id="edit-team-feedback" role="status" aria-live="polite"></p><div style="display:flex;justify-content:flex-end;gap:8px"><button type="button" id="btn-cancel-edit-team" class="btn btn-secondary btn-compact">CANCEL</button><button type="submit" id="btn-save-edit-team" class="btn btn-primary btn-compact">SAVE TEAM DETAILS</button></div></form></div>
+
   <script src="js/data.js"></script>
-  <script src="js/host.js"></script>
+  <script src="js/host.js?v=qa-dashboard-confirm-1"></script>
 </body>
 </html>

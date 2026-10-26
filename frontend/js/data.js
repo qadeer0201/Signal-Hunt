@@ -1,70 +1,31 @@
-
-/* Signal Hunt: confirmed frontend content and display data. */
+/* Signal Hunt: one event website, with an organizer-configured team roster. */
 window.SignalHuntData = {
   event: {
     name: "Signal Hunt",
     fest: "Nexus Vyoma 2026",
-    returnLocation: "Rooms 07 & 08"
+    returnLocation: "Rooms 07 & 08",
+    plannedEventMinutes: 120
   },
 
+  // Display palette; only colours assigned to registered teams appear at participant login.
   teams: [
-    { id: "black", name: "Black", color: "#171717", icon: "◆" },
     { id: "red", name: "Red", color: "#c93636", icon: "⚑" },
-    { id: "navy", name: "Navy Blue", color: "#233e65", icon: "◈" },
+    { id: "blue", name: "Blue", color: "#233e65", icon: "◈" },
+    { id: "green", name: "Green", color: "#26794b", icon: "❖" },
     { id: "yellow", name: "Yellow", color: "#e6c83d", icon: "✦" },
     { id: "orange", name: "Orange", color: "#e87832", icon: "ϟ" },
-    { id: "green", name: "Green", color: "#26794b", icon: "❖" },
     { id: "purple", name: "Purple", color: "#743bb0", icon: "✧" },
-    { id: "grey", name: "Grey", color: "#91949a", icon: "⬡" },
-    { id: "brown", name: "Brown", color: "#75472e", icon: "⌘" },
-    { id: "peach", name: "Peach", color: "#e9a08d", icon: "◉" }
+    { id: "cyan", name: "Cyan", color: "#20aeb9", icon: "⬡" },
+    { id: "white", name: "White", color: "#f1f0e7", icon: "◇" },
+    { id: "silver", name: "Silver", color: "#aeb4be", icon: "⌘" },
+    { id: "gold", name: "Gold", color: "#c79b25", icon: "◉" }
   ],
 
   stations: [
-    {
-      level: 1,
-      id: "morse",
-      name: "Morse Code",
-      short: "MORSE CODE",
-      description: "Dots and dashes conceal the message. Decode the rhythm to reveal the hidden truth.",
-      instruction: "Solve the physical clue at your station, then enter the unique code from the envelope.",
-      icon: "assets/morse-icon.webp",
-      image: "assets/morse-code.webp",
-      explanation: "Morse Code represents letters and numbers using short and long signals. Read the pattern carefully and keep the spacing between letters in mind."
-    },
-    {
-      level: 2,
-      id: "binary",
-      name: "Binary ASCII",
-      short: "BINARY ASCII",
-      description: "Only 0s and 1s hold the key. Read the digital trail to uncover what lies beneath.",
-      instruction: "Study the binary clue and decode the information before submitting your station code.",
-      icon: "assets/binary-icon.webp",
-      image: "assets/binary-ascii.webp",
-      explanation: "In standard 8-bit ASCII, each character is represented by eight binary digits. Keep leading zeroes and decode each group of eight bits."
-    },
-    {
-      level: 3,
-      id: "fsk",
-      name: "FSK Signals",
-      short: "FSK SIGNALS",
-      description: "Frequencies shift, and secrets travel unseen. Decode the changing signals to uncover the message.",
-      instruction: "Compare the signal frequencies and follow the clue given at your station.",
-      icon: "assets/fsk-icon.webp",
-      image: "assets/fsk-signals.webp",
-      explanation: "Frequency Shift Keying represents binary data using two different frequencies. In common examples, the lower frequency represents 0 and the higher frequency represents 1."
-    },
-    {
-      level: 4,
-      id: "final",
-      name: "Final Challenge",
-      short: "FINAL CHALLENGE",
-      description: "Combine what you learned. Every signal you decoded leads toward the final transmission.",
-      instruction: "Use your team's observations from all earlier stages to solve the final physical clue.",
-      icon: "assets/signal-hunt-logo.webp",
-      image: null,
-      explanation: "Use the patterns you learned in Morse Code, Binary ASCII, and FSK Signals. Check the clue carefully and work with your registered team."
-    }
+    { level: 1, id: "level-1", name: "Level 1", short: "LEVEL 01", description: "Use the riddle in your physical envelope to discover the next location.", instruction: "Find your team's envelope, then enter the unique verification code printed inside.", icon: "assets/morse-icon.webp", image: "assets/morse-code.webp", explanation: "Decode the signal in your physical clue, solve the riddle, and search for your team's envelope." },
+    { level: 2, id: "level-2", name: "Level 2", short: "LEVEL 02", description: "Your next physical clue leads to another hidden envelope.", instruction: "Use the clue printed in the envelope. Do not rely on the website for physical locations.", icon: "assets/binary-icon.webp", image: "assets/binary-ascii.webp", explanation: "The website records level verification; the physical envelope provides the riddle and destination." },
+    { level: 3, id: "level-3", name: "Level 3", short: "LEVEL 03", description: "Continue the hunt using your next physical riddle.", instruction: "Find the correct envelope and enter its code to verify this level.", icon: "assets/fsk-icon.webp", image: "assets/fsk-signals.webp", explanation: "Read your team's envelope carefully and enter only the envelope verification code on the website." },
+    { level: 4, id: "level-4", name: "Level 4", short: "LEVEL 04", description: "Complete your final physical clue and retrieve the final envelope.", instruction: "After the final envelope is verified, return to Rooms 7 & 8. A physical volunteer confirms finish order.", icon: "assets/signal-hunt-logo.webp", image: null, explanation: "The website records completion only. The physical volunteer confirms the official winner." }
   ],
 
   knowledge: [
@@ -95,50 +56,59 @@ window.SignalHuntData = {
   ],
 
   rules: [
-    "Teams must decode each clue and submit the correct answers on the website.",
-    "Teams must not skip stages or enter restricted areas.",
-    "Work only with your registered team members.",
-    "Do not tamper with other teams' materials.",
-    "Do not use outside assistance or unauthorized AI help.",
-    "Stay within the designated event areas.",
-    "Repeated violation of rules will lead to disqualification.",
-    "Harassment and unsafe conduct will lead to immediate termination.",
-    "Follow announcements and instructions carefully given by the organizing team.",
-    "Submit answers carefully on the website.",
-    "Keep your personal team details private."
+    "Decode the missing word in the physical riddle, solve the riddle, and find your team's hidden envelope.",
+    "Enter the unique verification code from the envelope to record level completion.",
+    "Work only with your registered team of 3–5 members.",
+    "Do not tamper with physical clues or other teams' envelopes.",
+    "Do not use outside assistance or unauthorized AI tools.",
+    "Stay within organizer-approved campus areas and follow volunteer directions.",
+    "Stay in browser fullscreen during active gameplay. A detected fullscreen exit eliminates the team; ask the organizer for reinstatement.",
+    "An eliminated team's level timer keeps running. Reinstatement does not reset or refund elapsed time.",
+    "Use in-app navigation between Home, Mission, Knowledge, Campus Map, Rules and Security.",
+    "Do not share team login codes or envelope verification codes with other teams.",
+    "Return to Rooms 7 & 8 with the final envelope. A physical volunteer verifies finish order."
   ],
 
   copy: {
-    loginInstruction: "Your mission begins here. Enter your Team Code to establish your signal.",
-    loginError: "SIGNAL NOT RECOGNIZED — Invalid Team Code. Verify your credentials and try again.",
+    loginInstruction: "Select your team colour and enter your classified team access code.",
+    loginError: "SIGNAL REJECTED — Invalid Team Code. Check credentials or team colour.",
     welcome: "WELCOME, OPERATIVE!",
-    welcomeBody: "Your team is connected. Prepare to decode the signals and begin your mission.",
+    welcomeBody: "Your terminal is authenticated. Stand by for host transmission.",
     waitingTitle: "STATUS: AWAITING THE SIGNAL…",
-    waitingBody: "The frequency is silent. Await the host’s transmission to begin your hunt.",
+    waitingBody: "The frequency is silent. The countdown will begin once the organizer initiates the hunt.",
     missionTitle: "MISSION BRIEFING: SIGNAL HUNT",
-    missionBody: "A signal has emerged from the unknown. Hidden codes hold the truth, and every clue leads deeper into the mystery. Decode the transmissions. Uncover what lies beneath. Your mission begins when the signal calls.",
-    activeBody: "The hunt is live; every signal leads closer to the truth.",
-    stationPlaceholder: "Enter the classified station code…",
-    emptyCode: "No signal detected. Enter the station code to proceed.",
-    invalidCode: "Signal rejected. The code does not match our records. Try again.",
-    successTitle: "SIGNAL DECODED — ACCESS GRANTED",
-    successBody: "The code is verified. Another mystery solved; your mission continues.",
-    invalidTitle: "SIGNAL REJECTED — ACCESS DENIED",
-    invalidBody: "The code is unrecognised. Recheck the signal and try again.",
-    completeTitle: "MISSION ACCOMPLISHED",
-    completeBody: "Every signal decoded. Every mystery uncovered. Your team has conquered the hunt. The final transmission is complete.",
+    missionBody: "A signal has emerged from the unknown. Hidden codes hold the truth, and every clue leads deeper into the mystery. Decode the transmissions. Uncover what lies beneath.",
+    activeBody: "Use the physical riddle to find your team's next hidden envelope.",
+    stationPlaceholder: "Enter the code printed inside your envelope…",
+    emptyCode: "Enter the envelope verification code to continue.",
+    invalidCode: "That code is not correct for your team's current level. Check the envelope and try again.",
+    successTitle: "LEVEL VERIFIED — ACCESS GRANTED",
+    successBody: "The envelope code is verified. Follow the next physical riddle.",
+    invalidTitle: "CODE REJECTED — TRY AGAIN",
+    invalidBody: "The envelope code was not recognized for your team's current level.",
+    completeTitle: "FOUR LEVELS VERIFIED",
+    completeBody: "Return to Rooms 7 & 8 with your final envelope. A physical volunteer confirms the official finishing order.",
     eliminatedTitle: "MISSION TERMINATED — ACCESS REVOKED",
-    eliminatedBody: "Your signal has been terminated. You are no longer authorised to continue the hunt."
+    eliminatedBody: "Your team has been eliminated under the event rules. The organizer may reinstate you; your level timer will continue."
   }
 };
 
 window.SignalHuntState = {
   currentTeam: null,
+  participantAuthenticated: false,
+  deviceId: null,
   currentPage: "home",
   currentLevel: 1,
-  completedLevel: 0,
-  completedStation: null,
-  demoGameStarted: false,
-  mockMode: true,
-  eliminationReason: "Leaving the website or navigating back violated the zero-warning policy."
+  completedLevels: 0,
+  totalLevels: 4,
+  currentLevelRemainingSeconds: null,
+  currentLevelTimeLimitSeconds: null,
+  currentLevelTimedOut: false,
+  currentLevelTimerActive: false,
+  gameStatus: "waiting",
+  eliminated: false,
+  eliminatedReason: "Violation recorded under event security policy.",
+  completed: false,
+  fullscreenRequired: false,
+  timerUpdatedAt: 0
 };

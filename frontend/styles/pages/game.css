@@ -19,7 +19,6 @@
 .instruction-strip { display: flex; align-items: flex-start; gap: 10px; width: 100%; margin-bottom: 14px; padding: 11px; background: #e6d8b4; border: 1px solid #d0c09a; border-radius: 8px; }
 .instruction-strip > span { color: #647b21; font-size: 1.15rem; }
 .instruction-strip p { margin: 0; color: #3c3728; font-size: .76rem; line-height: 1.5; }
-.demo-warning { margin: 0; color: #b6ae94; font: 600 .62rem var(--mono); text-align: center; }
 .station-code-card { display: flex; flex-direction: column; align-items: stretch; padding: 18px; text-align: center; }
 .station-key-icon { display: grid; place-items: center; width: 68px; height: 68px; align-self: center; margin: 1px 0 12px; border-radius: 50%; background: #171a10; color: var(--lime); font-size: 2rem; }
 .station-code-card .section-kicker { color: #6c6a43; text-align: center; }
@@ -34,3 +33,5 @@
 
 #view-active-game .current-challenge, #view-station-code .station-code-card { flex: 1 0 auto; }
 @media (max-width: 759px) { #view-active-game .current-challenge { justify-content: space-between; } #view-station-code .station-code-card { justify-content: center; } }
+
+.game-level-timer { width: 100%; margin: 0 0 13px; padding: 10px 12px; border: 1px solid #52593c; border-radius: 7px; background: #14180e; color: #d8ff36; font: 800 .72rem/1.5 var(--mono); letter-spacing: .03em; overflow-wrap: anywhere; }

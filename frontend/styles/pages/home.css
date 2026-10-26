@@ -34,3 +34,18 @@
   #view-home { min-height: calc(100dvh - var(--header-height) - var(--nav-height) - 42px); }
   #view-home .home-tiles { flex: 1 0 auto; grid-auto-rows: minmax(72px, 1fr); }
 }
+
+
+/* Campus map shown on participant Home; stays inside the app and never opens a new tab. */
+.campus-map-card { display: grid; gap: 10px; padding: 14px; overflow: hidden; }
+.campus-map-open { display: block; width: 100%; min-width: 0; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
+.campus-map-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.campus-map-heading h3 { margin: 2px 0 0; color: var(--ink); font: 900 1rem/1.2 var(--display); letter-spacing: .03em; }
+.campus-map-note { margin: 0; color: #414333; font-size: .78rem; line-height: 1.5; }
+.campus-map-image { display: block; width: 100%; height: auto; max-height: 420px; object-fit: contain; object-position: center; border: 1px solid #41482e; border-radius: 7px; background: #090b08; }
+@media (max-width: 520px) { .campus-map-card { padding: 10px; } .campus-map-image { max-height: none; } }
+.campus-map-viewer { position: fixed; inset: 0; z-index: 130; display: flex; flex-direction: column; padding: max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom)); background: #050604; }
+.campus-map-viewer[hidden] { display: none !important; }
+.campus-map-viewer-bar { display:flex; align-items:center; justify-content:space-between; flex:0 0 auto; gap:12px; padding:6px 2px 12px; color:var(--lime); font:800 .78rem var(--mono); letter-spacing:.1em; }
+.campus-map-viewer > img { display:block; width:100%; height:0; min-height:0; flex:1 1 auto; object-fit:contain; object-position:center; }
+@media (min-width:760px) { .campus-map-viewer { padding:16px 24px 20px; } .campus-map-viewer > img { max-width:1600px; margin-inline:auto; } }

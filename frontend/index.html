@@ -5,22 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0a0b09">
   <meta name="description" content="Signal Hunt — Nexus Vyoma 2026 campus challenge.">
+  <link rel="icon" type="image/webp" href="/assets/signal-hunt-logo.webp">
   <title>Signal Hunt — Nexus Vyoma 2026</title>
   <link rel="stylesheet" href="styles/base.css">
   <link rel="stylesheet" href="styles/components.css">
   <link rel="stylesheet" href="styles/pages/login.css">
   <link rel="stylesheet" href="styles/pages/home.css">
   <link rel="stylesheet" href="styles/pages/team-profile.css">
-  <link rel="stylesheet" href="styles/pages/mission.css">
-  <link rel="stylesheet" href="styles/pages/knowledge.css">
+  <link rel="stylesheet" href="styles/pages/mission.css?v=final-ui-2">
+  <link rel="stylesheet" href="styles/pages/knowledge.css?v=final-ui-2">
   <link rel="stylesheet" href="styles/pages/rules.css">
   <link rel="stylesheet" href="styles/pages/security.css">
-  <link rel="stylesheet" href="styles/pages/campus-map.css">
   <link rel="stylesheet" href="styles/pages/game.css">
   <link rel="stylesheet" href="styles/pages/results.css">
 </head>
 <body>
-  <!-- LOGIN: mock authentication for local UI testing only. -->
+  <!-- LOGIN SCREEN -->
   <section id="login-screen" class="login-screen" aria-labelledby="login-title">
     <div class="login-wrap">
       <img class="login-logo" src="assets/signal-hunt-logo.webp" alt="Signal Hunt logo">
@@ -28,27 +28,36 @@
       <h1 id="login-title">SIGNAL HUNT</h1>
       <p class="login-tagline">Find the signals. Solve the mystery. Unlock the truth.</p>
 
+      <div class="login-mode-switch" role="group" aria-label="Choose sign-in type">
+        <button id="team-login-mode" type="button" class="is-active" aria-pressed="true">TEAM LOGIN</button>
+        <button id="organizer-login-mode" type="button" aria-pressed="false">ORGANIZER / HOST</button>
+      </div>
+
       <form id="login-form" class="paper-card login-card">
         <p class="section-kicker">ACCESS YOUR TEAM</p>
-        <p class="login-instruction">Your mission begins here. Enter your Team Code to establish your signal.</p>
+        <p class="login-instruction">Select your team colour and enter your classified team access code.</p>
         <label class="field-label">Select your team colour</label>
         <div id="team-colour-options" class="team-colour-options" role="group" aria-label="Select team colour"></div>
         <input id="team-colour" type="hidden" value="">
 
-        <label class="field-label" for="team-code">Enter team code</label>
-        <input id="team-code" class="text-input" type="text" autocomplete="off" placeholder="Enter your Team Code…" required>
+        <label class="field-label" for="team-code">Enter team access code</label>
+        <input id="team-code" class="text-input" type="text" autocomplete="off" placeholder="Enter your unique Team Code…" required>
         <p id="login-error" class="form-message error-message" role="alert" hidden></p>
         <button class="btn btn-primary btn-wide" type="submit">ESTABLISH CONNECTION <span aria-hidden="true">→</span></button>
-        <p class="fine-print">TEAM ENTRY ONLY · ONE CODE PER TEAM</p>
-        <details class="demo-details">
-          <summary>Prototype test codes (not real credentials)</summary>
-          <div id="demo-team-codes" class="demo-code-list"></div>
-        </details>
+        <p class="fine-print">TEAM ACCESS ONLY · CAPACITY SET BY EVENT PROFILE</p>
+      </form>
+      <form id="organizer-login-form" class="paper-card login-card" hidden>
+        <p class="section-kicker">ORGANIZER ACCESS</p>
+        <p class="login-instruction">Sign in to configure teams, routes, timers and event controls.</p>
+        <label class="field-label" for="organizer-password">Organizer password</label>
+        <input id="organizer-password" class="text-input" type="password" autocomplete="current-password" required>
+        <p id="organizer-login-error" class="form-message error-message" role="alert" hidden></p>
+        <button class="btn btn-primary btn-wide" type="submit">OPEN HOST DASHBOARD →</button>
       </form>
     </div>
   </section>
 
-  <!-- APP: all views live here; navigation switches views without reload. -->
+  <!-- APP SHELL -->
   <div id="app-shell" class="app-shell is-hidden">
     <header class="app-header">
       <button class="brand-button" type="button" data-page="home" aria-label="Signal Hunt home">
@@ -61,13 +70,14 @@
         <button type="button" data-page="knowledge" class="nav-link">Knowledge</button>
         <button type="button" data-page="rules" class="nav-link">Rules</button>
         <button type="button" data-page="security" class="nav-link">Security</button>
+        <button type="button" data-page="campus-map" class="nav-link">Campus Map</button>
       </nav>
       <div class="header-actions">
-        <span class="connection-dot" title="Prototype status" aria-label="Prototype mode"></span>
+        <span id="header-game-timer" class="header-game-timer" hidden aria-live="polite">--:--</span>
+        <span class="connection-dot" title="Server Connected" aria-label="Live connection"></span>
         <button type="button" class="profile-shortcut" data-page="team-profile" aria-label="Open team profile">
           <span id="header-team-shield" class="team-shield small-shield">◆</span>
         </button>
-        <button id="logout-button" type="button" class="logout-button">LOGOUT</button>
       </div>
     </header>
 
@@ -95,19 +105,29 @@
         </div>
 
         <div class="prototype-notice">
-          <span class="prototype-label">LOCAL PREVIEW ONLY · NOT THE REAL HOST CONTROL</span>
-          <button id="preview-host-start" type="button" class="btn btn-primary btn-compact">Preview active game (local demo) <span aria-hidden="true">→</span></button>
+          <span class="prototype-label">SERVER-AUTHORITATIVE TRANSMISSION STATUS</span>
+          <button id="preview-host-start" type="button" class="btn btn-primary btn-compact">OPEN CURRENT CHALLENGE <span aria-hidden="true">→</span></button>
         </div>
 
         <div class="home-tiles" aria-label="Home shortcuts">
-          <button class="home-tile" type="button" data-page="mission"><span class="tile-icon" aria-hidden="true">▤</span><span class="tile-copy"><strong>Mission</strong><small>Mission briefing &amp; stations</small></span><span class="tile-arrow">›</span></button>
+          <button class="home-tile" type="button" data-page="mission"><span class="tile-icon" aria-hidden="true">▤</span><span class="tile-copy"><strong>Mission</strong><small>Mission briefing &amp; levels</small></span><span class="tile-arrow">›</span></button>
           <button class="home-tile" type="button" data-page="knowledge"><span class="tile-icon" aria-hidden="true">◈</span><span class="tile-copy"><strong>Knowledge</strong><small>Signal reference files</small></span><span class="tile-arrow">›</span></button>
           <button class="home-tile" type="button" data-page="rules"><span class="tile-icon" aria-hidden="true">✓</span><span class="tile-copy"><strong>Rules</strong><small>Operative guidelines</small></span><span class="tile-arrow">›</span></button>
           <button class="home-tile" type="button" data-page="team-profile"><span class="tile-icon" aria-hidden="true">♙</span><span class="tile-copy"><strong>Team Profile</strong><small>Colour, emblem &amp; status</small></span><span class="tile-arrow">›</span></button>
-          <button class="home-tile wide-tile" type="button" data-page="campus-map"><span class="tile-icon" aria-hidden="true">⌖</span><span class="tile-copy"><strong>Campus Map</strong><small>View the college map</small></span><span class="tile-arrow">›</span></button>
           <button class="home-tile" type="button" data-page="security"><span class="tile-icon" aria-hidden="true">⬡</span><span class="tile-copy"><strong>Security</strong><small>Mission integrity policy</small></span><span class="tile-arrow">›</span></button>
-          <button class="home-tile submit-tile" type="button" data-page="station-code"><span class="tile-icon" aria-hidden="true">⌁</span><span class="tile-copy"><strong>Submit Clue</strong><small>Enter the unique station code</small></span><span class="tile-arrow">›</span></button>
+          <button class="home-tile submit-tile" type="button" data-page="station-code"><span class="tile-icon" aria-hidden="true">⌁</span><span class="tile-copy"><strong>Submit Clue</strong><small>Enter the decoded answer</small></span><span class="tile-arrow">›</span></button>
         </div>
+
+      </section>
+
+      <!-- CAMPUS MAP -->
+      <section id="view-campus-map" class="view" aria-labelledby="campus-map-title" hidden>
+        <div class="section-heading"><div><p class="section-kicker">FIELD REFERENCE</p><h2 id="campus-map-title">2D CAMPUS MAP</h2></div><span class="section-id">MAP</span></div>
+        <div class="campus-map-card paper-card">
+          <p class="campus-map-note">Use this general campus overview for orientation. Your team's physical riddle—not this website—tells you where to search next.</p>
+          <button type="button" class="campus-map-open" aria-label="Open campus map viewer"><img class="campus-map-image" src="assets/campus-map.webp" alt="Two-dimensional campus overview showing campus buildings, paths and common areas" loading="lazy"></button>
+        </div>
+        <button type="button" class="btn btn-secondary btn-wide" data-page="home">← BACK TO HOME</button>
       </section>
 
       <!-- TEAM PROFILE -->
@@ -115,74 +135,72 @@
         <div class="section-heading"><div><p class="section-kicker">IDENTITY RECORD</p><h2 id="profile-title">TEAM PROFILE</h2></div><span class="section-id">SH-01</span></div>
         <div class="profile-paper paper-card">
           <div id="profile-shield" class="profile-shield"><span id="profile-team-symbol">◆</span></div>
-          <div class="profile-main"><p class="section-kicker">REGISTERED OPERATIVE UNIT</p><h3 id="profile-team-name">TEAM NOT LOGGED IN</h3><p id="profile-team-code" class="profile-code">PROTOTYPE MODE</p></div>
+          <div class="profile-main"><p class="section-kicker">REGISTERED OPERATIVE UNIT</p><h3 id="profile-team-name">TEAM NOT LOGGED IN</h3><p id="profile-team-code" class="profile-code">ACTIVE OPERATIVE TERMINAL</p></div>
           <div class="profile-divider"></div>
           <div class="profile-detail"><span>ASSIGNED COLOUR</span><strong id="profile-colour-name">—</strong><span id="profile-colour-swatch" class="profile-colour-swatch"></span></div>
-          <div class="profile-detail"><span>CURRENT STATUS</span><strong id="profile-status">AWAITING THE SIGNAL</strong></div>
-          <p class="profile-note">No participant names or personal member details are displayed.</p>
+          <div class="profile-detail"><span>MISSION STATUS</span><strong id="profile-status">AWAITING THE SIGNAL</strong></div>
+          <div class="profile-detail"><span>AUTHORIZED PLAYERS</span><strong id="profile-player-capacity">Capacity set by event</strong></div>
         </div>
         <button type="button" class="btn btn-secondary btn-wide" data-page="home">← BACK TO HOME</button>
       </section>
 
-      <!-- MISSION -->
+      <!-- MISSION BRIEFING -->
       <section id="view-mission" class="view" aria-labelledby="mission-title" hidden>
-        <div class="section-heading"><div><p class="section-kicker">SH-02 / BRIEFING FILE</p><h2 id="mission-title">MISSION</h2></div><span class="section-id">SH-02</span></div>
-        <article class="mission-card paper-card">
+        <div class="section-heading"><div><p class="section-kicker">SH-02 / OPERATIONAL ORDERS</p><h2 id="mission-title">MISSION BRIEFING</h2></div><span class="section-id">SH-02</span></div>
+        <div class="mission-card paper-card">
           <img class="mission-banner" src="assets/signal-hunt-banner.webp" alt="Signal Hunt mission artwork">
           <div class="mission-copy">
-            <p class="section-kicker">MISSION BRIEFING: SIGNAL HUNT</p>
-            <p>A signal has emerged from the unknown. Hidden codes hold the truth, and every clue leads deeper into the mystery. Decode the transmissions. Uncover what lies beneath. Your mission begins when the signal calls.</p>
+            <h3>OPERATION SIGNAL HUNT</h3>
+            <p>Decode the missing word in each physical envelope riddle, solve the complete riddle, and search for your team's next hidden envelope. The website records envelope-code verification; it does not reveal physical destinations.</p>
           </div>
-          <div class="stations-header"><h3>THE FOUR STATIONS</h3><span>4 SIGNALS</span></div>
-          <div class="station-list">
-            <div class="station-row"><span class="station-number">01</span><span class="station-copy"><strong>Morse Code</strong><small>Decode the rhythm.</small></span><span class="station-arrow" aria-hidden="true">›</span></div>
-            <div class="station-row"><span class="station-number">02</span><span class="station-copy"><strong>Binary ASCII</strong><small>Read the digital trail.</small></span><span class="station-arrow" aria-hidden="true">›</span></div>
-            <div class="station-row"><span class="station-number">03</span><span class="station-copy"><strong>FSK Signals</strong><small>Follow the frequency.</small></span><span class="station-arrow" aria-hidden="true">›</span></div>
-            <div class="station-row"><span class="station-number">04</span><span class="station-copy"><strong>Final Challenge</strong><small>Combine what you learned.</small></span><span class="station-arrow" aria-hidden="true">›</span></div>
-          </div>
-          <div class="mission-footer"><span>DECODE</span><span>OBSERVE</span><span>COLLABORATE</span></div>
-        </article>
+        </div>
+        <div class="station-grid" aria-label="Four hunt levels">
+          <article class="station-card paper-card"><div class="station-top"><span>LEVEL 01</span><strong class="station-name">MORSE CODE</strong></div><p>Decode the signal word, solve the physical riddle, and find your team's envelope.</p></article>
+          <article class="station-card paper-card"><div class="station-top"><span>LEVEL 02</span><strong class="station-name">BINARY</strong></div><p>Read the encoded word, solve the next riddle, and verify the envelope code online.</p></article>
+          <article class="station-card paper-card"><div class="station-top"><span>LEVEL 03</span><strong class="station-name">FSK</strong></div><p>Interpret the changing signal and follow the riddle to your next physical envelope.</p></article>
+          <article class="station-card paper-card"><div class="station-top"><span>LEVEL 04</span><strong class="station-name">COMBINED</strong></div><p>Complete the final hunt level. Bring the final envelope back to Rooms 7 &amp; 8.</p></article>
+        </div>
+        <button type="button" class="btn btn-secondary btn-wide" data-page="home">← BACK TO HOME</button>
       </section>
 
-      <!-- KNOWLEDGE -->
+      <!-- KNOWLEDGE BASE -->
       <section id="view-knowledge" class="view" aria-labelledby="knowledge-title" hidden>
-        <div class="section-heading"><div><p class="section-kicker">SH-03 / RESTRICTED REFERENCE</p><h2 id="knowledge-title">KNOWLEDGE</h2></div><span class="section-id">SH-03</span></div>
-        <div id="knowledge-list-view" class="knowledge-list-view">
-          <p class="archive-heading">CLASSIFIED SIGNAL FILE <span>— DECODE THE UNKNOWN</span></p>
+        <div class="section-heading"><div><p class="section-kicker">SH-03 / REFERENCE ARCHIVE</p><h2 id="knowledge-title">KNOWLEDGE</h2></div><span class="section-id">SH-03</span></div>
+        <div id="knowledge-list-view">
           <div class="knowledge-cards">
             <button class="knowledge-card" type="button" data-topic="morse"><span class="knowledge-thumb"><img src="assets/morse-icon.webp" alt="" loading="lazy"></span><span class="knowledge-copy"><strong>MORSE CODE</strong><small>Dots and dashes conceal the message. Decode the rhythm to reveal the hidden truth.</small><span class="view-reference">View Reference <b>›</b></span></span></button>
             <button class="knowledge-card" type="button" data-topic="binary"><span class="knowledge-thumb"><img src="assets/binary-icon.webp" alt="" loading="lazy"></span><span class="knowledge-copy"><strong>BINARY ASCII</strong><small>Only 0s and 1s hold the key. Read the digital trail to uncover what lies beneath.</small><span class="view-reference">View Reference <b>›</b></span></span></button>
             <button class="knowledge-card" type="button" data-topic="fsk"><span class="knowledge-thumb"><img src="assets/fsk-icon.webp" alt="" loading="lazy"></span><span class="knowledge-copy"><strong>FSK SIGNALS</strong><small>Frequencies shift, and secrets travel unseen. Decode the changing signals to uncover the message.</small><span class="view-reference">View Reference <b>›</b></span></span></button>
           </div>
+          <button type="button" class="btn btn-secondary btn-wide" data-page="home" style="margin-top:14px;">← BACK TO HOME</button>
         </div>
-        <div id="knowledge-detail-view" class="knowledge-detail-view is-hidden" aria-live="polite">
-          <div class="detail-heading"><button id="knowledge-back" type="button" class="btn btn-secondary btn-compact">← TOPICS</button><div><p class="section-kicker">CLASSIFIED SIGNAL FILE</p><h3 id="knowledge-detail-title">MORSE CODE</h3></div></div>
-          <p id="knowledge-detail-description" class="knowledge-explanation"></p>
+        <div id="knowledge-detail-view" class="paper-card is-hidden">
+          <div class="reference-bar"><button id="knowledge-back" type="button" class="btn btn-secondary btn-compact">← BACK TO TOPICS</button><button id="open-reference-fullscreen" type="button" class="btn btn-secondary btn-compact">FULL SCREEN ↗</button></div>
+          <h3 id="knowledge-detail-title">TOPIC</h3>
+          <p id="knowledge-detail-description" class="reference-intro"></p>
           <div class="reference-frame"><img id="knowledge-detail-image" src="assets/morse-code.webp" alt="Morse Code reference chart"><div id="knowledge-image-placeholder" class="image-placeholder is-hidden"><span>IMAGE TO BE ADDED</span><small>Extra Tips reference sheet pending</small></div></div>
-          <button id="open-reference-fullscreen" type="button" class="btn btn-secondary btn-wide reference-fullscreen-button">OPEN FULL SCREEN</button>
-          <p class="reference-footnote">Reference file · For use during the challenge</p>
         </div>
       </section>
 
       <!-- RULES -->
       <section id="view-rules" class="view" aria-labelledby="rules-title" hidden>
-        <div class="section-heading"><div><p class="section-kicker">SH-04 / OPERATIVE PROTOCOL</p><h2 id="rules-title">RULES &amp; GUIDELINES</h2></div><span class="section-id">SH-04</span></div>
-        <div class="rules-panel paper-card">
-          <div class="rules-intro"><span class="rules-main-icon" aria-hidden="true">✓</span><div><strong>READ BEFORE THE SIGNAL</strong><small>All teams must follow the event guidelines.</small></div></div>
-          <ol id="rules-list" class="rules-list">
-            <li><span class="rule-icon">01</span><span>Teams must decode each clue and submit the correct answers on the website.</span></li>
-            <li><span class="rule-icon">02</span><span>Teams must not skip stages or enter restricted areas.</span></li>
-            <li><span class="rule-icon">03</span><span>Work only with your registered team members.</span></li>
-            <li><span class="rule-icon">04</span><span>Do not tamper with other teams' materials.</span></li>
+        <div class="section-heading"><div><p class="section-kicker">SH-04 / PROTOCOL</p><h2 id="rules-title">RULES</h2></div><span class="section-id">SH-04</span></div>
+        <div class="rules-card paper-card">
+          <ol class="rules-list">
+            <li><span class="rule-icon">01</span><span>Teams must decode each clue in sequence and submit answers on the web terminal.</span></li>
+            <li><span class="rule-icon">02</span><span>Teams must not skip stages or enter restricted campus areas.</span></li>
+            <li><span class="rule-icon">03</span><span>Work strictly with your registered team members (up to 5 per team).</span></li>
+            <li><span class="rule-icon">04</span><span>Do not tamper with physical clues or other teams' station materials.</span></li>
             <li><span class="rule-icon">05</span><span>Do not use outside assistance or unauthorized AI help.</span></li>
-            <li><span class="rule-icon">06</span><span>Stay within the designated event areas.</span></li>
-            <li><span class="rule-icon">07</span><span>Repeated violation of rules will lead to disqualification.</span></li>
-            <li><span class="rule-icon">08</span><span>Harassment and unsafe conduct will lead to immediate termination.</span></li>
-            <li><span class="rule-icon">09</span><span>Follow announcements and instructions carefully given by the organizing team.</span></li>
-            <li><span class="rule-icon">10</span><span>Submit answers carefully on the website.</span></li>
-            <li><span class="rule-icon">11</span><span>Keep your personal team details private.</span></li>
+            <li><span class="rule-icon">06</span><span>Find physical locations from the riddles. Stay inside organizer-approved event areas and follow volunteer directions.</span></li>
+            <li><span class="rule-icon">07</span><span>After login, remain in browser fullscreen. A detected fullscreen exit eliminates the team; only an organizer can reinstate it.</span></li>
+            <li><span class="rule-icon">08</span><span>Your level timer keeps running while eliminated. Organizer reinstatement does not reset or refund elapsed time.</span></li>
+            <li><span class="rule-icon">09</span><span>Use in-app navigation between Home, Mission, Knowledge, Campus Map, Rules and Security. Keep fullscreen active during gameplay.</span></li>
+            <li><span class="rule-icon">10</span><span>Submitting an envelope verification code records that level. The physical volunteer decides the official finishing order.</span></li>
+            <li><span class="rule-icon">11</span><span>Keep team login codes and envelope verification codes private.</span></li>
           </ol>
         </div>
+        <button type="button" class="btn btn-secondary btn-wide" data-page="home" style="margin-top:14px;">← BACK TO HOME</button>
       </section>
 
       <!-- SECURITY -->
@@ -190,56 +208,49 @@
         <div class="section-heading"><div><p class="section-kicker">SH-05 / MISSION INTEGRITY</p><h2 id="security-title">SECURITY</h2></div><span class="section-id">SH-05</span></div>
         <div class="security-card paper-card">
           <div class="security-symbol" aria-hidden="true">⬡</div>
-          <p class="section-kicker">ZERO-WARNING POLICY</p>
+          <p class="section-kicker">EVENT INTEGRITY POLICY</p>
           <h3>STAY WITHIN THE MISSION</h3>
-          <p>Leaving the website or using the browser Back button will result in immediate elimination.</p>
+          <p>After login, keep Signal Hunt in browser fullscreen for the duration of the game. The allowed website pages remain available through in-app navigation.</p>
           <div class="security-divider"></div>
-          <p class="security-footnote">Moving between pages inside Signal Hunt is allowed. Follow the approved event rules and organiser instructions throughout the hunt.</p>
+          <p class="security-footnote">During active gameplay, a detected fullscreen exit is reported to the backend and eliminates the team. The backend records the violation, the level timer continues, and an organizer can reinstate the team without restoring elapsed time. Browser and operating-system controls cannot be made tamper-proof.</p>
         </div>
-        <div class="demo-only-card"><span class="prototype-label">LOCAL PREVIEW ONLY</span><p>This button previews the elimination screen. It does not enforce real elimination.</p><button id="preview-elimination" type="button" class="btn btn-danger btn-wide">Preview elimination screen</button></div>
+        <button type="button" class="btn btn-secondary btn-wide" data-page="home" style="margin-top:14px;">← BACK TO HOME</button>
       </section>
 
-      <!-- CAMPUS MAP -->
-      <section id="view-campus-map" class="view" aria-labelledby="campus-map-title" hidden>
-        <div class="section-heading"><div><p class="section-kicker">SH-06 / FIELD REFERENCE</p><h2 id="campus-map-title">CAMPUS MAP</h2></div><span class="section-id">SH-06</span></div>
-        <div class="map-card paper-card"><p class="map-caption">COLLEGE GROUNDS · REFERENCE MAP</p><div class="map-image-frame"><img src="assets/campus-map.webp" alt="Illustrated college campus map supplied for Signal Hunt"></div><p class="map-note">Use the map as a guide. Follow event-area boundaries and organiser instructions.</p><button class="btn btn-secondary btn-wide" type="button" data-page="home">← BACK TO HOME</button></div>
-      </section>
-
-      <!-- ACTIVE GAME (local demo until backend integration) -->
+      <!-- ACTIVE GAME -->
       <section id="view-active-game" class="view" aria-labelledby="active-game-title" hidden>
-        <div class="section-heading"><div><p class="section-kicker">LIVE TRANSMISSION · PROTOTYPE</p><h2 id="active-game-title">THE HUNT IS LIVE</h2></div><span class="game-live-pill"><span></span> ACTIVE</span></div>
+        <div class="section-heading"><div><p class="section-kicker">LIVE TRANSMISSION</p><h2 id="active-game-title">THE HUNT IS LIVE</h2></div><span class="game-live-pill"><span></span> ACTIVE</span></div>
         <div class="game-progress-panel">
-          <div class="progress-topline"><span id="game-level-label">LEVEL 1 OF 4</span><span id="game-progress-count">0 / 4 COMPLETE</span></div>
+          <div class="progress-topline"><span id="game-level-label">LEVEL 1 OF 4</span><span id="game-progress-count">0 / 4 LEVELS COMPLETE</span></div>
           <div class="level-track" id="level-track" aria-label="Level progress"><span class="level-step is-current">01</span><span class="level-connector"></span><span class="level-step">02</span><span class="level-connector"></span><span class="level-step">03</span><span class="level-connector"></span><span class="level-step">04</span></div>
         </div>
         <div class="current-challenge paper-card">
           <div id="game-topic-icon" class="challenge-icon"><img src="assets/morse-icon.webp" alt=""></div>
-          <p class="section-kicker">CURRENT STATION</p>
-          <h3 id="game-station-title">01 · MORSE CODE</h3>
-          <p id="game-station-description">The hunt is live; every signal leads closer to the truth.</p>
-          <div class="instruction-strip"><span aria-hidden="true">⌁</span><p id="game-instruction">Solve the physical clue at your station, then enter the unique code from the envelope.</p></div>
-          <button id="initiate-transmission" type="button" class="btn btn-primary btn-wide">INITIATE TRANSMISSION <span aria-hidden="true">→</span></button>
+          <p class="section-kicker">CURRENT LEVEL</p>
+          <h3 id="game-station-title">LEVEL 01</h3>
+          <p id="game-station-description">Find the physical envelope for your current level.</p>
+          <div id="game-level-timer" class="game-level-timer" role="timer" aria-live="polite">TIMER STARTS WHEN THE ORGANIZER STARTS THE GAME</div>
+          <div class="instruction-strip"><span aria-hidden="true">⌁</span><p id="game-instruction">Awaiting riddle transmission from server...</p></div>
+          <button id="initiate-transmission" type="button" class="btn btn-primary btn-wide">ENTER ENVELOPE CODE <span aria-hidden="true">→</span></button>
         </div>
-        <p class="demo-warning">DEMO MODE · No timer. Station codes are fake test values until the backend is connected.</p>
-        <p class="game-nav-note">Mission, Knowledge, Rules, Security, Team Profile and Campus Map remain available during the challenge.</p>
+        <p class="game-nav-note">Home, Mission, Knowledge, Campus Map, Rules, Security and Team Profile remain available through in-app navigation. Stay in fullscreen during gameplay.</p>
       </section>
 
-      <!-- STATION CODE ENTRY -->
+      <!-- STATION ANSWER ENTRY -->
       <section id="view-station-code" class="view" aria-labelledby="station-code-title" hidden>
-        <div class="section-heading"><div><p class="section-kicker">STATION AUTHENTICATION</p><h2 id="station-code-title">ENTER STATION CODE</h2></div><span class="section-id" id="code-level-label">LVL 01</span></div>
+        <div class="section-heading"><div><p class="section-kicker">ENVELOPE VERIFICATION</p><h2 id="station-code-title">ENTER ENVELOPE CODE</h2></div><span class="section-id" id="code-level-label">LEVEL 01</span></div>
         <div class="station-code-card paper-card">
           <div class="station-key-icon" aria-hidden="true">⌕</div>
           <p class="section-kicker">CLASSIFIED TRANSMISSION</p>
-          <h3>STATION VERIFICATION</h3>
-          <p>Enter the unique code printed inside your team's station envelope.</p>
+          <h3>SOLUTION VERIFICATION</h3>
+          <p>Find your team's physical envelope and enter the unique verification code printed inside.</p>
           <form id="station-code-form">
-            <label for="station-code-input" class="field-label">UNIQUE STATION CODE</label>
-            <input id="station-code-input" class="text-input code-input" type="text" autocomplete="off" placeholder="Enter the classified station code…">
+            <label for="station-code-input" class="field-label">ENVELOPE VERIFICATION CODE</label>
+            <input id="station-code-input" class="text-input code-input" type="text" autocomplete="off" aria-describedby="station-code-message" placeholder="Enter envelope code…">
             <p id="station-code-message" class="form-message" role="alert" hidden></p>
-            <button class="btn btn-primary btn-wide" type="submit">VERIFY TRANSMISSION</button>
+            <button class="btn btn-primary btn-wide" type="submit">VERIFY ENVELOPE CODE</button>
           </form>
-          <p class="fine-print">Codes are not case-sensitive in this prototype.</p>
-          <details class="demo-details"><summary>Prototype station codes (testing only)</summary><div id="demo-station-codes" class="demo-code-list"></div></details>
+          <p class="fine-print">The server checks the code against this team's current level. Riddles and physical destinations are not shown here.</p>
         </div>
         <button type="button" class="btn btn-secondary btn-wide back-to-game" data-page="active-game">← BACK TO CURRENT LEVEL</button>
       </section>
@@ -250,7 +261,7 @@
           <div class="result-symbol" aria-hidden="true">×</div>
           <p class="section-kicker">TRANSMISSION FAILED</p>
           <h2 id="invalid-title">SIGNAL REJECTED — ACCESS DENIED</h2>
-          <p>The code is unrecognised. Recheck the signal and try again.</p>
+          <p>The solution was not recognized. Recheck your notes and try again.</p>
           <button id="retry-station-code" class="btn btn-danger btn-wide" type="button">TRY AGAIN</button>
         </div>
       </section>
@@ -262,9 +273,9 @@
           <p class="section-kicker">TRANSMISSION CONFIRMED</p>
           <h2 id="success-title">SIGNAL DECODED — ACCESS GRANTED</h2>
           <p>The code is verified. Another mystery solved; your mission continues.</p>
-          <div class="completed-level-card"><span id="success-level-label">LEVEL 1 COMPLETE</span><strong id="success-station-name">MORSE CODE</strong><div id="success-progress" class="success-progress">01 / 04</div></div>
+          <div class="completed-level-card"><span id="success-level-label">LEVEL 1 VERIFIED</span><strong id="success-station-name">SIGNAL DECODED</strong><div id="success-progress" class="success-progress">00 / 00</div></div>
           <button id="continue-game" class="btn btn-primary btn-wide" type="button">CONTINUE <span aria-hidden="true">→</span></button>
-          <p class="fine-print">The next challenge appears after you continue.</p>
+          <p class="fine-print">The next challenge unlocks immediately after you continue.</p>
         </div>
       </section>
 
@@ -274,9 +285,9 @@
           <div class="trophy-symbol" aria-hidden="true">★</div>
           <p class="section-kicker">FINAL TRANSMISSION</p>
           <h2 id="complete-title">MISSION ACCOMPLISHED</h2>
-          <p>Every signal decoded. Every mystery uncovered. Your team has conquered the hunt. The final transmission is complete.</p>
-          <div class="complete-stamp"><strong>ALL 4 STATIONS COMPLETE</strong><span>Return to Rooms 07 &amp; 08</span></div>
-          <button id="finish-demo" class="btn btn-primary btn-wide" type="button">RETURN TO HOME (DEMO)</button>
+          <p>Every signal decoded. Every mystery uncovered. Your team has conquered Signal Hunt. The final transmission is complete.</p>
+          <div class="complete-stamp"><strong>ALL FOUR LEVELS VERIFIED</strong><span>Return to Rooms 07 &amp; 08 with the final envelope. A physical volunteer confirms finish order.</span></div>
+          <button id="finish-demo" class="btn btn-primary btn-wide" type="button">RETURN TO HOME</button>
         </div>
       </section>
 
@@ -286,10 +297,10 @@
           <div class="result-symbol" aria-hidden="true">!</div>
           <p class="section-kicker">SECURITY ALERT</p>
           <h2 id="eliminated-title">MISSION TERMINATED — ACCESS REVOKED</h2>
-          <p>Your signal has been terminated. You are no longer authorised to continue the hunt.</p>
-          <div class="elimination-reason"><strong>REASON FOR ELIMINATION</strong><span id="elimination-reason-text">Leaving the website or navigating back violated the zero-warning policy.</span></div>
-          <div class="return-instruction">Stop playing and return to <strong>Rooms 07 &amp; 08</strong>. Report to the organising team.</div>
-          <button id="elimination-home" type="button" class="btn btn-secondary btn-wide">RETURN TO HOME (DEMO)</button>
+          <p>Your team's access has been revoked. You are no longer authorized to submit answers.</p>
+          <div class="elimination-reason"><strong>NOTICE</strong><span id="elimination-reason-text">If you believe this was accidental, contact an organizer at the control desk.</span></div>
+          <div class="return-instruction">Report to <strong>Rooms 07 &amp; 08</strong> to speak with event staff.</div>
+          <button id="elimination-home" type="button" class="btn btn-secondary btn-wide">AWAIT ORGANIZER REINSTATEMENT</button>
         </div>
       </section>
     </main>
@@ -299,7 +310,17 @@
       <button type="button" data-page="mission" class="bottom-nav-item"><span>▤</span><small>Mission</small></button>
       <button type="button" data-page="knowledge" class="bottom-nav-item"><span>◈</span><small>Knowledge</small></button>
       <button type="button" data-page="rules" class="bottom-nav-item"><span>✓</span><small>Rules</small></button>
+      <button type="button" data-page="campus-map" class="bottom-nav-item"><span>⌖</span><small>Map</small></button>
     </nav>
+  </div>
+
+  <div id="fullscreen-gate" class="fullscreen-gate" role="dialog" aria-modal="true" aria-labelledby="fullscreen-gate-title" hidden>
+    <div class="fullscreen-gate-card">
+      <p class="section-kicker">LOCKED PARTICIPANT SESSION</p>
+      <h2 id="fullscreen-gate-title">FULLSCREEN REQUIRED</h2>
+      <p>Signal Hunt must remain in fullscreen. Your team may be waiting for organizer review or reinstatement. Re-enter fullscreen to continue when permitted.</p>
+      <button id="fullscreen-reenter-button" type="button" class="btn btn-primary btn-wide">RE-ENTER FULLSCREEN</button>
+    </div>
   </div>
 
   <div id="reference-fullscreen" class="reference-lightbox is-hidden" role="dialog" aria-modal="true" aria-label="Full-screen knowledge reference">
@@ -307,17 +328,21 @@
     <img id="reference-fullscreen-image" alt="Full-screen signal reference">
   </div>
 
+  <div id="campus-map-viewer" class="campus-map-viewer" role="dialog" aria-modal="true" aria-label="Campus map viewer" hidden>
+    <div class="campus-map-viewer-bar"><strong>2D CAMPUS MAP</strong><button id="close-campus-map-viewer" type="button" class="btn btn-secondary btn-compact">CLOSE ✕</button></div>
+    <img src="assets/campus-map.webp" alt="Two-dimensional campus overview showing campus buildings, paths and common areas">
+  </div>
+
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <!-- Ordered classic scripts keep the prototype easy to inspect in beginner editors. -->
+  <!-- Scripts -->
   <script src="js/data.js"></script>
-  <script src="js/mock-data.js"></script>
-  <script src="js/api.js"></script>
+  <script src="js/api.js?v=qa-cookie-session-1"></script>
   <script src="js/navigation.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/auth.js?v=qa-cookie-session-1"></script>
   <script src="js/profile.js"></script>
   <script src="js/pages/knowledge.js"></script>
-  <script src="js/pages/game-flow.js"></script>
+  <script src="js/pages/game-flow.js?v=input-polling-final-2"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,30 @@
+# Render deployment blueprint for the single Signal Hunt website.
+# A paid web service is required for the persistent disk used by SQLite.
+services:
+  - type: web
+    name: signal-hunt-nexus-vyoma
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/status
+    numInstances: 1
+    disk:
+      name: signal-hunt-nexus-vyoma-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: STRICT_SECURITY
+        value: "1"
+      - key: SECURE_COOKIES
+        value: "1"
+      - key: MAX_TEAMS
+        value: "10"
+      - key: GAME_DURATION_MINUTES
+        value: "80"
+      - key: DATABASE_PATH
+        value: /data/signalhunt.db
+      - key: FRONTEND_DIR
+        value: /app/Frontend

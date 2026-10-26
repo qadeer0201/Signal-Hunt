@@ -5,8 +5,4 @@ document.addEventListener("DOMContentLoaded", () => {
   window.TeamProfile.init();
   window.KnowledgePage.init();
   window.GameFlow.init();
-  document.getElementById("logout-button").addEventListener("click", () => {
-    document.getElementById("home-status-title").textContent = window.SignalHuntData.copy.waitingTitle;
-    document.getElementById("home-status-text").textContent = window.SignalHuntData.copy.waitingBody;
-  });
 });
